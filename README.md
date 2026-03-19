@@ -1,4 +1,4 @@
-# Realms of Legacy — Character Leveler
+# Realms of Legacy — Character Creator and Leveler
 
-A step-by-step character leveling wizard for the Realms of Legacy TTRPG.
+A step-by-step character creation and leveling wizard for the Realms of Legacy TTRPG.
 
