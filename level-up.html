@@ -1947,11 +1947,25 @@ function saveJSON() {
 }
 
 function levelUpAgain() {
-  // Save to localStorage only (no auto-download), then reload
-  const updCh=buildUpdatedChar();
-  const data={...baseChar, ch:updCh, levelHistory:[...(baseChar.levelHistory||[]),buildHistoryEntry()], savedAt:new Date().toLocaleString()};
+  // Build the updated character and restart the wizard in place — no reload needed
+  const updCh = buildUpdatedChar();
+  const data = {
+    ...baseChar,
+    ch: updCh,
+    levelHistory: [...(baseChar.levelHistory||[]), buildHistoryEntry()],
+    savedAt: new Date().toLocaleString(),
+  };
   try { localStorage.setItem('rol_character', JSON.stringify(data)); } catch(e) {}
-  location.reload();
+  // Re-initialise directly
+  baseChar = data;
+  initEffective();
+  initSession();
+  buildSteps();
+  currentStep = 0;
+  renderBanner();
+  renderProgress();
+  renderStep();
+  window.scrollTo({top:0, behavior:'smooth'});
 }
 
 // ── LocalStorage auto-detection on page load ────────────────────────
@@ -1963,16 +1977,25 @@ document.addEventListener('DOMContentLoaded', () => {
       const ch = data.ch || data;
       if (ch && ch.cls) {
         const lvl = ch.level || 1;
-        const panel = document.getElementById('ls-panel');
-        const nameEl = document.getElementById('ls-char-name');
-        if (panel) panel.style.display = 'block';
-        if (nameEl) {
-          nameEl.textContent = (ch.name||'Unnamed Hero') + ' — Level ' + lvl + ' ' + (ch.cls||'') + ' ' + (ch.specialty||'');
-          if (lvl >= 20) {
-            nameEl.textContent += ' (Level 20 — max level reached)';
-            const btn = panel.querySelector('.btn-primary');
-            if (btn) btn.disabled = true;
-          }
+        if (lvl >= 20) {
+          // Max level — just show the notice panel
+          const panel = document.getElementById('ls-panel');
+          const nameEl = document.getElementById('ls-char-name');
+          if (panel) panel.style.display = 'block';
+          if (nameEl) nameEl.textContent = (ch.name||'Unnamed Hero') + ' — Level 20 (max level reached)';
+          const btn = panel && panel.querySelector('.btn-primary');
+          if (btn) btn.disabled = true;
+        } else {
+          // Auto-start the wizard immediately — no click needed
+          baseChar = data;
+          initEffective();
+          initSession();
+          buildSteps();
+          document.getElementById('load-panel').style.display = 'none';
+          document.getElementById('wizard').style.display = 'block';
+          renderBanner();
+          renderProgress();
+          renderStep();
         }
       }
     }
