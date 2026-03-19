@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Realms of Legacy — Character Tools</title>
+<style>
+:root{
+  --accent:#4a3f8f;--accent-lt:#ede9fb;--accent-dk:#2e2660;
+  --gold:#b8860b;--safe:#16a34a;--muted:#6b7280;--rule:#e5e0d8;--ink:#1a1614;--bg:#f4f1ec;
+  --r:12px;--font-ui:"Segoe UI",Arial,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);font-family:var(--font-ui);color:var(--ink);min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+.hero{text-align:center;max-width:700px;width:100%}
+.hero h1{font-size:2.3rem;color:var(--accent-dk);letter-spacing:.02em;margin-bottom:8px}
+.hero p{color:var(--muted);font-size:1rem;margin-bottom:40px;line-height:1.6;max-width:520px;margin-left:auto;margin-right:auto}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:20px;width:100%}
+@media(max-width:540px){.cards{grid-template-columns:1fr}}
+.ocard{background:#fff;border:2px solid var(--rule);border-radius:var(--r);padding:28px 24px;
+  text-decoration:none;color:var(--ink);transition:all .15s;display:block}
+.ocard:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(74,63,143,.12)}
+.ocard.create{border-color:var(--accent)}
+.ocard.create:hover{border-color:var(--accent-dk)}
+.ocard.levelup:hover{border-color:var(--safe)}
+.ocard .icon{font-size:2.8rem;margin-bottom:14px}
+.ocard h2{font-size:1.2rem;font-weight:700;color:var(--accent-dk);margin-bottom:8px}
+.ocard.levelup h2{color:var(--safe)}
+.ocard p{font-size:.88rem;color:var(--muted);line-height:1.6}
+.ocard .badge{display:inline-block;margin-top:16px;padding:7px 16px;
+  border-radius:20px;font-weight:700;font-size:.82rem;background:var(--accent);color:#fff}
+.ocard.levelup .badge{background:var(--safe)}
+.ls-notice{margin-top:18px;padding:12px 18px;background:#f0fdf4;
+  border:1px solid var(--safe);border-radius:var(--r);font-size:.87rem;color:var(--safe);font-weight:600}
+.footer{margin-top:32px;color:var(--muted);font-size:.8rem}
+</style>
+</head>
+<body>
+<div class="hero">
+  <div style="font-size:3.2rem;margin-bottom:10px">⚔️</div>
+  <h1>Realms of Legacy</h1>
+  <p>Create a Level 1 character or level up an existing one. Each tool guides you step by step and exports a filled PDF character sheet.</p>
+
+  <div class="cards">
+    <a href="create.html" class="ocard create">
+      <div class="icon">📜</div>
+      <h2>Create a Character</h2>
+      <p>Build a brand-new Level 1 character from scratch — attributes, lineage, class, specialty, gear, lifepath, and talents.</p>
+      <div class="badge">Start Creating →</div>
+    </a>
+    <a href="level-up.html" class="ocard levelup">
+      <div class="icon">⬆</div>
+      <h2>Level Up</h2>
+      <p>Advance an existing character to the next level. Load your saved JSON to spend Status Points, Skill Points, and your Talent Point.</p>
+      <div class="badge" id="lu-badge">Level Up →</div>
+    </a>
+  </div>
+
+  <div class="ls-notice" id="ls-notice" style="display:none"></div>
+
+  <div class="footer">Keep <code>Character_Sheet_Form_Fill.pdf</code> in the same folder for PDF exports.</div>
+</div>
+
+<script>
+try {
+  const saved = localStorage.getItem('rol_character');
+  if (saved) {
+    const data = JSON.parse(saved);
+    const ch = data.ch || data;
+    if (ch && ch.cls) {
+      const lvl = ch.level || 1;
+      const notice = document.getElementById('ls-notice');
+      const badge  = document.getElementById('lu-badge');
+      if (notice) {
+        notice.style.display = 'block';
+        notice.textContent = '\u2713 ' + (ch.name||'Unnamed Hero') + ' (Level ' + lvl + ' ' + (ch.cls||'') + ') is saved — click Level Up to continue.';
+      }
+      if (badge && lvl < 20) {
+        badge.textContent = (ch.name||'Character') + ' \u2192 Level ' + (lvl+1);
+      } else if (badge && lvl >= 20) {
+        badge.textContent = 'Max Level Reached';
+      }
+    }
+  }
+} catch(e) {}
+</script>
+</body>
+</html>
