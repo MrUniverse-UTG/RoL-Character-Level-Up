@@ -1332,9 +1332,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 });
-</script>
-</body>
-</html>;
+
 const WEAPON_DATA = {
   'Short Sword':      {range:'5 ft.', mod:'+1', damage:'6 Slash',  attr:'STR_AGI_HIGH', skill:'Brawl', features:'Balanced'},
   'Shortsword':       {range:'5 ft.', mod:'+1', damage:'6 Slash',  attr:'STR_AGI_HIGH', skill:'Brawl', features:'Balanced'},
@@ -2025,7 +2023,10 @@ function saveJSON() {
 }
 
 function levelUpAgain() {
-  saveJSON();
+  // Save to localStorage only (no auto-download), then reload
+  const updCh=buildUpdatedChar();
+  const data={...baseChar, ch:updCh, levelHistory:[...(baseChar.levelHistory||[]),buildHistoryEntry()], savedAt:new Date().toLocaleString()};
+  try { localStorage.setItem('rol_character', JSON.stringify(data)); } catch(e) {}
   location.reload();
 }
 
