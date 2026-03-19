@@ -1,0 +1,2024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Realms of Legacy — Level Up</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<style>
+:root{--accent:#4a3f8f;--accent-lt:#ede9fb;--accent-dk:#2e2660;--gold:#b8860b;--gold-lt:#fef9e7;
+  --safe:#16a34a;--danger:#dc2626;--muted:#6b7280;--rule:#e5e0d8;--ink:#1a1614;--bg:#f4f1ec;
+  --r:10px;--font-ui:"Segoe UI",Arial,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);font-family:var(--font-ui);color:var(--ink);min-height:100vh}
+#app{max-width:860px;margin:0 auto;padding:20px}
+.header{text-align:center;padding:28px 0 20px;border-bottom:2px solid var(--rule);margin-bottom:24px}
+.header h1{font-size:1.7rem;color:var(--accent-dk)}
+.header p{color:var(--muted);font-size:.9rem;margin-top:6px}
+.card{background:#fff;border:1px solid var(--rule);border-radius:var(--r);padding:20px;margin-bottom:16px}
+.card h2{font-size:1.05rem;font-weight:700;color:var(--accent-dk);margin-bottom:12px}
+.card h3{font-size:.82rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+.btn{display:inline-block;padding:10px 22px;border-radius:7px;font-family:var(--font-ui);font-weight:600;font-size:.9rem;cursor:pointer;border:none;transition:all .12s}
+.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:var(--accent-dk)}
+.btn-primary:disabled{opacity:.45;cursor:not-allowed}
+.btn-secondary{background:#fff;color:var(--accent-dk);border:2px solid var(--rule)}.btn-secondary:hover{border-color:var(--accent)}
+.btn-export{background:var(--gold);color:#fff;font-size:.95rem;padding:11px 24px}
+.btn-save{background:#e0f2fe;color:#0369a1;border:1px solid #7dd3fc;padding:11px 24px}
+.info-box{background:var(--accent-lt);border-left:4px solid var(--accent);border-radius:6px;padding:10px 14px;font-size:.85rem;margin:8px 0}
+.warn-box{background:#fffbea;border-left:4px solid var(--gold);border-radius:6px;padding:10px 14px;font-size:.85rem;margin:8px 0}
+.good-box{background:#f0fdf4;border-left:4px solid var(--safe);border-radius:6px;padding:10px 14px;font-size:.85rem;margin:8px 0}
+.prog-bar{display:flex;gap:4px;margin-bottom:20px}
+.prog-step{flex:1;height:6px;border-radius:3px;background:var(--rule);transition:background .2s}
+.prog-step.done{background:var(--accent)}.prog-step.active{background:var(--gold)}
+.field-label{display:block;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:5px}
+input[type=text],input[type=number],select,textarea{width:100%;padding:9px 11px;border:1px solid var(--rule);border-radius:6px;font-family:var(--font-ui);font-size:.9rem;background:#fff}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);border-color:transparent}
+.stat-badge{display:inline-block;padding:3px 9px;border-radius:12px;font-size:.75rem;font-weight:700;background:var(--accent-lt);color:var(--accent-dk);margin:2px}
+.stat-badge.gold{background:var(--gold-lt);color:var(--gold)}
+.opt-chip{display:inline-block;padding:5px 12px;border-radius:20px;font-size:.82rem;font-weight:600;cursor:pointer;border:2px solid var(--rule);background:#fff;margin:3px;transition:all .1s}
+.opt-chip:hover{border-color:var(--accent)}
+.opt-chip.sel{border-color:var(--accent);background:var(--accent-lt);color:var(--accent-dk)}
+.opt-chip.sel-green{border-color:var(--safe);background:#d1fae5;color:var(--safe)}
+.opt-chip.dim{opacity:.35;cursor:default}
+.skill-row{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;border-radius:6px;margin-bottom:4px;background:#f8f7f4}
+.attr-row{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border-radius:8px;margin-bottom:6px;border:2px solid var(--rule);background:#f8f7f4}
+.sp-btn{width:30px;height:30px;border-radius:50%;border:2px solid var(--rule);background:#fff;font-size:1rem;cursor:pointer;font-weight:700;line-height:1}
+.sp-btn:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+.sp-btn:disabled{opacity:.3;cursor:not-allowed}
+.nav-btns{display:flex;justify-content:space-between;align-items:center;margin-top:20px;padding-top:16px;border-top:1px solid var(--rule)}
+.stat-card{background:var(--accent-lt);border-radius:8px;padding:10px;text-align:center}
+.stat-card .val{font-size:1.5rem;font-weight:700;color:var(--accent-dk)}
+.stat-card .lbl{font-size:.72rem;color:var(--muted);text-transform:uppercase}
+.tag{display:inline-block;font-size:.68rem;font-weight:700;padding:1px 6px;border-radius:10px;margin-left:5px;vertical-align:middle}
+.tag-gold{background:var(--gold);color:#fff}
+.tag-grey{background:#aaa;color:#fff}
+.tag-green{background:var(--safe);color:#fff}
+.talent-desc{background:#fffbea;border:1px solid var(--gold);border-radius:8px;padding:12px;margin-top:10px;font-size:.85rem}
+table.rtable{width:100%;border-collapse:collapse;font-size:.82rem;margin-top:8px}
+table.rtable th{background:var(--accent-dk);color:#fff;padding:5px 10px;text-align:left}
+table.rtable td{padding:5px 10px;border-bottom:1px solid var(--rule)}
+table.rtable tr.hl td{background:#fff9c4;font-weight:700}
+#load-panel{text-align:center;padding:40px 20px}
+.file-drop{border:3px dashed var(--rule);border-radius:var(--r);padding:36px 20px;cursor:pointer;transition:border-color .2s}
+.file-drop:hover{border-color:var(--accent)}
+.file-drop input{display:none}
+</style>
+</head>
+<body><div id="app">
+<div class="header">
+  <h1>⬆ Realms of Legacy — Level Up</h1>
+  <p>Load your character JSON, then walk through each level-up choice step by step.</p>
+</div>
+<div id="load-panel">
+  <h2 style="font-size:1.3rem;color:var(--accent-dk);margin-bottom:10px">Load Your Character</h2>
+  <p style="color:var(--muted);max-width:500px;margin:0 auto 20px">Select the JSON saved from the RoL Character Creator. Your character will advance to the next level.</p>
+  <div class="file-drop" onclick="document.getElementById('jf').click()">
+    <div style="font-size:2.5rem;margin-bottom:8px">📂</div>
+    <div style="font-weight:700;color:var(--accent-dk)">Click to load character JSON</div>
+    <div style="font-size:.82rem;color:var(--muted);margin-top:4px">Saved from the RoL Character Creator</div>
+    <input type="file" id="jf" accept=".json" onchange="loadChar(event)">
+  </div>
+  <div id="load-err" style="display:none;margin-top:12px" class="warn-box"></div>
+</div>
+<div id="wizard" style="display:none">
+  <div id="char-banner" class="card" style="margin-bottom:12px"></div>
+  <div id="prog-bar" class="prog-bar"></div>
+  <div id="step-content"></div>
+  <div class="nav-btns">
+    <button class="btn btn-secondary" id="btn-back" onclick="prevStep()" style="display:none">← Back</button>
+    <div></div>
+    <button class="btn btn-primary" id="btn-next" onclick="nextStep()">Next →</button>
+  </div>
+</div>
+</div>
+<script>
+'use strict';
+// === GAME DATA ===
+const SKILLS = {
+  STR: [{key:'Brawl',      name:'Brawl'},     {key:'Might',      name:'Might'},
+        {key:'Endure',     name:'Endure'},    {key:'Intimidate', name:'Intimidate'}],
+  AGI: [{key:'Move',       name:'Move'},      {key:'Hide',       name:'Hide'},
+        {key:'Finesse',    name:'Finesse'},   {key:'Shoot',      name:'Shoot'}],
+  WIT: [{key:'Analyze',    name:'Analyze'},   {key:'Scout',      name:'Scout'},
+        {key:'Insight',    name:'Insight'},   {key:'Survival',   name:'Survival'}],
+  EMP: [{key:'Manipulate', name:'Manipulate'},{key:'Perform',    name:'Perform'},
+        {key:'Medical',    name:'Medical'},   {key:'Tame',       name:'Tame'}],
+};
+const ATTRIBUTES=[{key:"STR",name:"Strength"},{key:"AGI",name:"Agility"},{key:"WIT",name:"Wits"},{key:"EMP",name:"Empathy"}];
+const MARTIAL_TALENTS = ['Boar Style', 'Brawler', 'Calvary Fighter', 'Crane Style', 'Defender', 'Dragon Style', 'Duelist', 'Ignore Pain', 'Mantis Style', 'Master of Defense', 'Opportunist', 'Porcupine Style', 'Primal Style', 'Rabbit Style', 'Rubber Style', 'Sniper Style', 'Tiger Style', 'Tortoise Style', 'Viper Style', 'Wolf Style'];
+const SORCERY_TALENTS_ALL = ['Elemental Attunement', 'Innate Magic', 'Megamind', 'Mental Shield', 'Runic Magic', 'Spell Slinger', 'Study of Aeromancy', 'Study of Blood', 'Study of Contagion', 'Study of Cryomancy', 'Study of Death', 'Study of Displacement', 'Study of Divinity', 'Study of Geomancy', 'Study of Illusion', 'Study of Pyromancy', 'Study of Recovery', 'Study of Shadows', 'Twist Magicka', 'War Caster'];
+// Level 1 character creation — excludes talents that require other talents as prerequisites
+const SORCERY_TALENTS = ['Innate Magic', 'Mental Shield', 'Runic Magic', 'Study of Aeromancy', 'Study of Blood', 'Study of Contagion', 'Study of Cryomancy', 'Study of Death', 'Study of Displacement', 'Study of Divinity', 'Study of Geomancy', 'Study of Illusion', 'Study of Pyromancy', 'Study of Recovery', 'Study of Shadows'];
+const GENERAL_TALENTS = ['Academic', 'Angelic Blood', 'Animal Ally', 'Animal Friendship', 'Backseat Braining', 'Caster Initiate', 'Demonic Blood', 'Field Medic', 'Full Dodge', 'Heckler', 'Inspiring', 'Intimidating', 'Keen Eyes', 'Linguist', 'Look Over There', 'Luck of the Gods', 'Master Spy', 'Min Max', 'Mobile', 'Naturally Gifted', 'Skilled', 'Sneaky', 'Steady Hands', 'Steel Body', 'Steel Mind', 'Steel Muscles', 'Steel Nerves', 'Strong Arm', 'Sturdy', 'Vigilant', 'Warfare Initiate'];
+const WARLOCK_STUDIES = ['Study of Blood', 'Study of Aeromancy', 'Study of Cryomancy', 'Study of Geomancy', 'Study of Divinity', 'Study of Death', 'Study of Pyromancy', 'Study of Contagion', 'Study of Shadows', 'Study of Illusion', 'Study of Recovery', 'Study of Displacement'];
+const SPECIALTY_TALENT_TEXT = {
+  Pugilist: 'Pugilist Form: As a Pugilist, your Unarmed Strikes have a base damage of 6 Blunt. Your hands in Unarmed Strikes count as 1h melee weapons for the sake of Parries, Off-Hand Attacks, and Martial Talents.',
+};
+const TALENT_DATA = {
+  "Boar Style": [
+    "Unlock <em>Boar's Temper (A)</em>. Spend 2 Sorce Points: charge up to 10 ft in a line and make a melee attack. If you moved at least 10 ft in a straight line before the attack, base damage increases by 2.",
+    "Boar's Temper now lets you charge up to 20 feet.",
+    "If you moved at least 10 ft in a straight line while using Boar's Temper, base damage now increases by 4 instead of 2.",
+    "When you use Boar's Temper, spend 2 additional Sorce Points to deal 2 extra damage for every 5 ft moved in a straight line (up to +12 extra damage).",
+    "Spend 4 additional Sorce Points: charge through hostile creatures' spaces. Creatures you charge through take damage as if hit by a Melee Weapon Attack."
+  ],
+  "Brawler": [
+    "Spend 2 Sorce Points to attempt a Grapple on an Opportunity Strike instead of a Melee Weapon Attack.",
+    "You can Grapple creatures one size larger than you with a -1 modifier.",
+    "While Grappling a creature, they gain a -3 modifier when attacking creatures other than the one grappling them.",
+    "You can attempt to Grapple a creature two sizes larger than you with a -2 modifier.",
+    "While you have a creature Grappled, spend 6 Sorce Points to give them the Restrained Condition until the Grapple ends."
+  ],
+  "Calvary Fighter": [
+    "While mounted on a creature, all physical damage your mount receives is halved.",
+    "When a creature targets your mount with a Melee or Ranged Weapon Attack, spend 2 Sorce Points as a Free action to redirect it to target you instead.",
+    "If your mount is a Beast, it can now use any of its melee attacks with a -3 modifier while you're mounted (or ignore modifiers if it already has that ability).",
+    "When you move at least 10 ft in a straight line while mounted before making a Melee Weapon Attack, your attack's base damage increases by 4.",
+    "If your mount is a Beast, your Melee Weapon Attacks while mounted gain +2 base damage. Against unmounted creatures smaller than your mount, it's +4 instead."
+  ],
+  "Crane Style": [
+    "<em>Crane's Grace (P)</em>: Spend 2 Sorce Points + Quick action to leap 10 ft in a line without provoking Opportunity Strikes. You can leap over hostile creatures the same size or smaller.",
+    "Crane's Grace now lets you leap up to 15 feet.",
+    "<em>Flutter (A)</em>: Spend 4 Sorce Points to make a Melee Weapon Attack. Hit or miss, you then leap 15 ft away from the target without provoking Opportunity Strikes.",
+    "After using Crane's Grace or Flutter, you benefit from the Disengage action until the end of your turn.",
+    "Crane's Grace may now be used as a Minor Action instead of a Quick Action. Flutter becomes a Power (P) that can be activated as a Free Action after any Melee Weapon Attack."
+  ],
+  "Defender": [
+    "<em>Guard (P)</em>: When a creature within 5 ft of you is attacked by a Melee or Ranged Weapon Attack, use a Reaction to attempt to Block or Parry the attack for them. You must wield a weapon or shield to Guard.",
+    "Spend 2 Sorce Points as a Free Action instead of a Reaction to use Guard.",
+    "When you Guard a creature and they still get hit, spend 3 Sorce Points to redirect half of the attack's damage to you.",
+    "When a creature within 5 ft of you makes a Might or Move save, spend 2 Sorce Points as a Free Action to Assist that save with your Might or Move.",
+    "Spend 4 Sorce Points to enter a Defender Stance until the start of your next turn. While in it, you can Guard without spending Sorce or a Reaction, and Block or Parry attacks against yourself without a Reaction."
+  ],
+  "Dragon Style": [
+    "<em>Piercing Blow (P)</em>: Spend 3 Sorce Points to shoot or throw a powerful attack in a 20-ft line. All creatures in the path take Ranged Weapon Attack damage.",
+    "Piercing Blow's line now has a range of 40 feet.",
+    "<em>Spread Blow (P)</em>: Spend 6 Sorce Points to fire a shot or throw a weapon in a 20-ft cone. Each creature in the cone takes Ranged Weapon Attack damage.",
+    "All Powers from this talent deal an additional 4 damage of the weapon's base damage type.",
+    "<em>Explosive Blow (P)</em>: Spend 9 Sorce Points to fire at a point within your weapon's max range. The Sorce infusion explodes in a 20-ft-radius sphere. Each creature in the sphere takes Ranged Weapon Attack damage."
+  ],
+  "Duelist": [
+    "<em>Riposte (P)</em>: If your Parry prevents a melee attack from hitting, spend 2 Sorce Points to deal half the damage you would deal if you hit with a Melee Weapon Attack to the attacker.",
+    "You can now Parry Ranged Weapon and Spell attacks.",
+    "When targeted by a Melee or Ranged Weapon Attack, spend 3 Sorce Points as a Free Action instead of a Reaction to Parry.",
+    "When you use Riposte, it now deals the full damage of your attack instead of half.",
+    "When you Parry an attack, spend 4 Sorce Points to reroll up to three dice in the check."
+  ],
+  "Ignore Pain": [
+    "<em>Toughen Up (P)</em>: When you take damage, use a Reaction to reduce the damage taken by 4 (minimum 1). Cannot reduce Fear or Psychic damage.",
+    "Spend 2 Sorce Points as a Free Action instead of a Reaction to use Toughen Up.",
+    "Toughen Up now works against Fear and Psychic damage.",
+    "When you use Toughen Up, spend 2 additional Sorce Points as a Free Action to increase the damage reduction to 12 (minimum 1).",
+    "<em>Didn't Hear No Bell (P)</em>: If damage would reduce your HP or MP to 0, spend 2 Sorce Points as a Free Action to regain up to 24 HP or MP after rolling for the Wound or Trauma gained."
+  ],
+  "Mantis Style": [
+    "<em>Multi Strike (A)</em>: Spend 3 Sorce Points to hit with two 1h weapons in one attack. First weapon deals full damage; second deals half damage. The second weapon's damage does not benefit from critical success.",
+    "Your first Off-Hand Attack on your turn only has a -2 modifier.",
+    "Your first Off-Hand Attack on your turn only has a -1 modifier.",
+    "When you Multi Strike, the second weapon deals equal damage to what it would normally deal on a successful weapon attack (instead of half).",
+    "If you successfully hit with Multi Strike, you can use it again as a Quick action with a -1 modifier until the end of your turn."
+  ],
+  "Master of Defense": [
+    "While wearing an armor set or natural armor, your max DP increases by 4.",
+    "While wearing an armor set or natural armor, your max DP increases by an additional 8.",
+    "While wearing an armor set or natural armor, your max DP increases by an additional 12.",
+    "While wearing an armor set or natural armor, your max DP increases by an additional 16.",
+    "While wearing an armor set or natural armor, your max DP increases by an additional 20."
+  ],
+  "Opportunist": [
+    "When a creature willingly enters your weapon's reach for the first time on a turn, you can make an Opportunity Strike against them.",
+    "When you can make an Opportunity Strike, spend 2 Sorce Points as a Free Action instead of a Reaction.",
+    "Spend 4 Sorce Points as a Free Action to make an Opportunity Strike on a creature that has Disengaged.",
+    "<em>Cripple (P)</em>: When you hit with an Opportunity Strike, spend 3 Sorce Points as a Free Action to reduce the enemy's Speed by half until the start of their next turn.",
+    "Cripple now reduces the enemy's Speed to 0 until the start of their next turn."
+  ],
+  "Porcupine Style": [
+    "While wielding a shield, you can use it as a melee weapon. The shield has base Blunt damage equal to double its defense modifier.",
+    "<em>Counter (P)</em>: When you successfully Block a melee attack and the attacker is within 5 ft, spend 4 Sorce Points as a Free Action to deal damage to the attacker as if you hit them with the shield.",
+    "Whenever you Block a melee attack and the attacker is within 5 ft, the attacker takes 2 Blunt damage regardless if they succeed or fail the attack.",
+    "The base damage of shields you wield increases by 4.",
+    "<em>Pummel (P)</em>: When you successfully attack with a shield, spend 6 Sorce Points as a Free Action to attempt to Shove the creature Prone. If you succeed, use a Quick Action until end of turn to deal shield damage again."
+  ],
+  "Primal Style": [
+    "<em>Cleave (P)</em>: After you successfully hit with a Melee Weapon Attack, spend 3 Sorce Points as a Quick action to deal your weapon damage to another creature within your melee weapon's reach.",
+    "Spend the Sorce Points to activate Cleave as a Minor action.",
+    "Spend the Sorce Points to activate Cleave as a Free action.",
+    "When you would use Cleave, spend 6 Sorce Points instead of 3 to target up to two different creatures within reach.",
+    "When you use Cleave, spend 9 Sorce Points instead of 3 to target up to four different creatures within reach."
+  ],
+  "Rabbit Style": [
+    "<em>With Haste (P)</em>: Once on your turn, spend 2 Sorce Points as a Free action to increase your Speed by 10 feet until the end of your turn.",
+    "While under the effects of With Haste, you can also run across water and up walls.",
+    "While under the effects of With Haste, you can Hasten as a Quick Action on your turn.",
+    "While under the effects of With Haste, spend 2 Sorce Points to Hasten as a Free Action once per turn.",
+    "When you activate With Haste, the bonus speed increases to 30 and you benefit from the Disengage action until the end of your turn."
+  ],
+  "Rubber Style": [
+    "<em>Bounce Strike (P)</em>: After successfully hitting with a Ranged Weapon Attack, spend 3 Sorce Points as a Quick action. Choose another creature within 15 ft of the creature you hit - they take Ranged Weapon Attack damage.",
+    "Spend the Sorce Points to activate Bounce Strike as a Minor action.",
+    "Spend the Sorce Points to activate Bounce Strike as a Free action.",
+    "When you use Bounce Strike, spend 6 Sorce Points instead of 3 to also target a third creature within 15 ft of the second.",
+    "When you use Bounce Strike, spend 9 Sorce Points to also target a fourth creature within 15 ft of the third."
+  ],
+  "Sniper Style": [
+    "When your Ranged Attack benefits from Aim, it gains an additional +1 modifier (total +2 modifier).",
+    "Spend 2 Sorce Points on your turn to Aim as a Free action (once per turn).",
+    "When you make a Ranged Weapon Attack benefiting from Aim, spend 2 Sorce Points to reroll one die.",
+    "When you hit with an Aimed Ranged Weapon Attack, its base damage is increased by 2.",
+    "When you Aim, spend your remaining Speed as a Free Action to enhance it. Until end of turn, your next aimed attack gains +2 base damage per 10 Speed spent (max +10)."
+  ],
+  "Tiger Style": [
+    "When you hit with a Melee Weapon Attack benefiting from Wind-Up, its base damage is increased by 2.",
+    "Spend 2 Sorce Points on your turn to Wind-Up as a Free action (once per turn).",
+    "When you make a Melee Weapon Attack benefiting from Wind-Up, spend 2 Sorce Points to reroll one die.",
+    "When you hit with a Wind-Up Melee Weapon Attack, its base damage is increased by an additional 2 (total of 4).",
+    "Using Wind-Up while already benefiting from Wind-Up creates a Mega-Wind-Up. Rank 3 benefit: reroll up to two dice. Rank 4 benefit: +8 base damage instead of +4."
+  ],
+  "Tortoise Style": [
+    "<em>Fortify (P)</em>: While wielding a shield, spend up to 3 Sorce Points as a Quick action to Fortify, gaining 12 Temp DP for 1 minute or until you stop wielding the shield.",
+    "When you make a Move save to reduce or avoid damage, apply your shield's modifier as a positive modifier to your save.",
+    "Spend 2 Sorce Points instead of a Reaction to Block a melee or ranged attack with a shield.",
+    "When you use Fortify, the Temp DP it grants has resistance against Slash, Pierce, and Blunt damage.",
+    "When you Block an attack, spend 4 Sorce Points to reroll up to three dice in the check."
+  ],
+  "Viper Style": [
+    "<em>Leg Strike (A)</em>: Standard action, -3 modifier. On a success, all of the creature's Speeds are reduced by 20 feet until the start of your next turn (cannot reduce below half their normal amount).",
+    "<em>Arm Strike (A)</em>: Standard action, -3 modifier. On a success, the creature's base damage on attacks is reduced by 4 until the start of your next turn.",
+    "Leg Strike and Arm Strike now inflict only a -2 modifier instead of -3.",
+    "Creatures affected by Leg Strike also gain -2 to Agility checks. Creatures affected by Arm Strike also gain -2 to Strength checks.",
+    "<em>Head Strike (A)</em>: When you make a Melee or Ranged Weapon Attack as a Standard action, take a -4 modifier to make it a Head Strike. On a hit, the creature gains the Slowed Condition until the start of your next turn."
+  ],
+  "Wolf Style": [
+    "<em>Flank (P)</em>: When you and an ally are both within 5 feet of a hostile creature, you are Flanking. While Flanking, you get a +1 modifier to melee attacks against that creature.",
+    "When you Flank a creature, the base damage of your melee attacks increases by 2 against that creature.",
+    "<em>Team Effort (P)</em>: When you first Flank an enemy on your turn, choose an ally within 5 ft. They gain the Rank 1 and Rank 2 benefits of this Talent against the Flanked creature until the start of your next turn.",
+    "You and the chosen ally in Team Effort gain a +2 modifier and +4 base damage on melee attacks when benefiting from Flank and Team Effort.",
+    "<em>Team Strike (A)</em>: While Flanking an enemy, spend 4 Sorce Points. Make a melee attack - hit or miss, an ally within 5 ft of the enemy may make an Opportunity Strike at -3 as a Free action."
+  ],
+  "Elemental Attunement": [
+    "Pick one element: Fire, Frost, Electric, or Acid. When you deal damage from a Spell with the same type as your Elemental Attunement, you deal an additional 4 damage of that type.",
+    "Your Spells that deal the same type of damage as your Elemental Attunement ignore resistances against that damage type.",
+    "When you deal damage from a Spell with your Attunement element, you now deal 8 additional damage instead of 4.",
+    "Your HP and DP gain resistance to the damage type that matches your Elemental Attunement. If either already has resistance, it instead gains immunity.",
+    "When you deal damage from a Spell with your Attunement element, you now deal 12 additional damage instead of 8."
+  ],
+  "Innate Magic": [
+    "You innately learn a Rank 1 Spell. Pick any Spell from any Study of Sorcery. It is always prepared and doesn't count against your prepared Spells limit. You don't need an Arcane Foci for its Spell check.",
+    "You innately learn a Rank 2 Spell from any Study.",
+    "You innately learn a Rank 3 Spell from any Study.",
+    "You innately learn a Rank 4 Spell from any Study.",
+    "You innately learn a Rank 5 Spell from any Study."
+  ],
+  "Megamind": [
+    "Choose 1 known Rank 1 Spell as your first Signature Spell. Signature Spells are always prepared and don't count against your prepared Spells. They gain +2 Power Levels when cast (or reduced Sorce cost if no Power Level).",
+    "All Rank 0 Spells you know are always prepared without counting against your prepared Spells limit.",
+    "Choose a known Rank 2 Spell as your second Signature Spell.",
+    "All Spells you know are now always prepared.",
+    "Choose a known Rank 3 Spell as your third Signature Spell."
+  ],
+  "Mental Shield": [
+    "When you take damage that isn't Fear or Psychic, use a Reaction to redirect up to 10 of the damage to your MP. You cannot redirect more than half the damage taken.",
+    "The amount of damage you can redirect increases to 20 (still max half the damage).",
+    "When you take Fear damage, use a Reaction to halve the damage taken.",
+    "The amount of damage you can redirect is any amount, so long as it's not more than half the damage taken.",
+    "Spend 2 Sorce Points as a Free Action instead of a Reaction to transfer half the damage taken."
+  ],
+  "Runic Magic": [
+    "You gain the ability to inscribe runes on objects and surfaces. You learn one Runic Inscription. Available at Rank 1: Rune of Cover, Rune of Accuracy, Rune of Elements, Rune of Alarm.",
+    "You learn a second Runic Inscription.",
+    "You learn a third Runic Inscription. New options available: Rune of Protection, Rune of Harm.",
+    "You may now have up to two Runes active at once. If you already have 2, inscribing a new rune disables the oldest one. New options: Rune of Sanctuary, Rune of Sorce.",
+    "While you have a Rune active, use a Quick Action to move it to a new location or object without spending Sorce to recreate it."
+  ],
+  "Spell Slinger": [
+    "When making an initiative check, you can make a Spell check instead for a specific Study you know. The Spell you plan to cast on your first turn must be from that Study. Must wield an Arcane Foci.",
+    "You no longer need an Arcane Foci for this initiative check. You gain a +2 modifier on the initiative check.",
+    "The Spell check for initiative can be based on the Rank of your highest Study of Sorcery Talent, even if casting from a different Study. +1 additional modifier (total +3).",
+    "On a successful initiative check with this Talent, choose whether your first Spell cast gains 2 Power Levels or has its Sorce Point cost reduced by 3 (minimum 1).",
+    "On a successful initiative check with this Talent, if your first Spell has a casting time of Standard or Quick action, you can cast it as a Minor action on your first turn."
+  ],
+  "Twist Magicka": [
+    "You gain the ability to twist your Spells to bend to your will. Gain one Magicka. Choose from: Distant (double range, 2 SP), Extend (double duration, 2 SP), Elemental (change damage type, 2 SP), Careful (pick immune creatures, 2-6 SP).",
+    "You gain a second Magicka.",
+    "You gain a third Magicka. New options available: Quick Magicka, Subtle Magicka.",
+    "You gain a fourth Magicka. New options available: Double Magicka, Explosive Magicka.",
+    "You can now use up to 2 Magicka per turn (previously limited to 1 per round)."
+  ],
+  "War Caster": [
+    "When you must make an Endure save to keep your focus after taking non-Fear/Psychic damage, you gain a +2 modifier.",
+    "You gain the ability to Encant as a Quick action. When you Encant, your next Spell check gains a +1 modifier. If you perform any action besides casting a Spell before using it, you lose this benefit.",
+    "When you perform an Opportunity Strike, you can cast a Rank 1 or lower Spell. The Spell must only target the creature that triggered the Opportunity Strike.",
+    "You can ignore the Hand and Tongue components of casting Spells.",
+    "If you fail an Endure save to maintain focus on a Spell, you can use this to gain 1 success (once per Light or Full Rest). Psychic damage no longer inflicts the additional -2 modifier on Endure saves to maintain focus."
+  ],
+  "Study of Aeromancy": [
+    "You learn and can prepare Spells with a Rank <= 1 from the Study of Aeromancy: Jolt, Bellowing Shout, Lightning Arc, Fast as Light.",
+    "New Spells available: Reflux, Small Nimbus.",
+    "New Spells available: Lighting Beam, Flash Step.",
+    "New Spells available: Enraged Nimbus, Spear of Voltara.",
+    "New Spells available: Storm of Fury, Magnetivus."
+  ],
+  "Study of Blood": [
+    "You learn and can prepare Spells with a Rank <= 1 from the Study of Blood: Vampiric Slash, Infatuate, Enthrall Person, Infuse Confuse.",
+    "New Spells available: Adrenaline Boost, Stir Emotions.",
+    "New Spells available: Hot Head, Brain Freeze.",
+    "New Spells available: Surge Flow, Slow Flow.",
+    "New Spells available: Bend Blood, Brain Rot."
+  ],
+  "Study of Contagion": [
+    "You learn and can prepare Spells with a Rank <= 1 from the Study of Contagion: Acid Dart, Sicken Pulse, Toxic Wave, Witherplague.",
+    "New Spells available: Blindblight, Proliferate.",
+    "New Spells available: Feral Pox, Eroding Sludge.",
+    "New Spells available: Mindflare, Stonefever.",
+    "New Spells available: Plague Requiem, Bone Rot."
+  ],
+  "Study of Cryomancy": [
+    "You learn and can prepare Spells with a Rank <= 1 from the Study of Cryomancy: Ice Spear, Sculpt Ice, Daggers of Ice, Ice Barrier.",
+    "New Spells available: Frostbite, Ice Armor.",
+    "New Spells available: Flash Freeze, Cryostasis.",
+    "New Spells available: Unstable Shard, Boreal Binds.",
+    "New Spells available: Blizzard, Avalanche."
+  ],
+  "Study of Death": [
+    "You learn and can prepare Spells with a Rank <= 1 from the Study of Death: Reaper Scythe, Recompose, Summon Skeleservant, Death Speech.",
+    "New Spells available: Reap, Curse Creature.",
+    "New Spells available: Raise Dead, Undying Rune.",
+    "New Spells available: Drain Youth, Death Guillotine.",
+    "New Spells available: Dark Exchange, Aura of Undeath."
+  ],
+  "Study of Displacement": [
+    "You learn and can prepare Spells with a Rank <= 1 from the Study of Displacement: Pocketswap, Infini Pocket, Body Swap, Minor Portals.",
+    "New Spells available: Tactical Retreat, Create Hole.",
+    "New Spells available: Reposition, Rescue.",
+    "New Spells available: Major Portals, Skip Stride.",
+    "New Spells available: Control Space, Shroud Sanctum."
+  ],
+  "Study of Divinity": [
+    "You learn and can prepare Spells with a Rank <= 1 from the Study of Divinity: Blessing of Protection, Searing Flare, Vengeful Smite, Blessing of Pacifism.",
+    "New Spells available: Blessing of Guardian, Explosive Smite.",
+    "New Spells available: Blessing of Radiance, Holy Smite.",
+    "New Spells available: Divine Sanctuary, Blessing of Flight.",
+    "New Spells available: Primal Smite, Divine Intervention."
+  ],
+  "Study of Geomancy": [
+    "You learn and can prepare Spells with a Rank <= 1 from the Study of Geomancy: Earth Bend, Rock Catapault, Repair Minerals, Spiked Terrain.",
+    "New Spells available: Debris Sandstorm, Propel Creature.",
+    "New Spells available: Earth Structure, Summon Earth Warrior.",
+    "New Spells available: Summon Earth Knight, Hurl Boulder.",
+    "New Spells available: Entomb, Summon Earth Golem."
+  ],
+  "Study of Illusion": [
+    "You learn and can prepare Spells with a Rank <= 1 from the Study of Illusion: Lesser Illusion, Fashionate, Greater Illusion, Create Disguise.",
+    "New Spells available: Invisibility, Create Duplicate.",
+    "New Spells available: Play Dead, Powerful Illusion.",
+    "New Spells available: Greater Invisibility, Mass Disguise.",
+    "New Spells available: Mass Duplicate, Disguised Domain."
+  ],
+  "Study of Pyromancy": [
+    "You learn and can prepare Spells with a Rank <= 1 from the Study of Pyromancy: Dancing Flame, Fire Ray, Burst Self, Fire Missile.",
+    "New Spells available: Fire Aura, Fire Breath.",
+    "New Spells available: Explosion, Flame Jettison.",
+    "New Spells available: Immolate, Wall of Fire.",
+    "New Spells available: Fire Blossom, Fire Storm."
+  ],
+  "Study of Recovery": [
+    "You learn and can prepare Spells with a Rank <= 1 from the Study of Recovery: Transfer Life, Dislocate, Reinvigorate, Calm Emotions.",
+    "New Spells available: Fortify, Purify.",
+    "New Spells available: Remove Bane, Mend Injuries.",
+    "New Spells available: Regeneration, Healing Mist.",
+    "New Spells available: Repair Body, Deny Death."
+  ],
+  "Study of Shadows": [
+    "You learn and can prepare Spells with a Rank <= 1 from the Study of Shadows: Feed Fear, Manipulate Darkness, Terrifying Gloom, Fall.",
+    "New Spells available: Shadow Walk, Terrorizing Shadows.",
+    "New Spells available: Cloak of Shadows, Mind Reave.",
+    "New Spells available: Consume Fears, Menacing Aura.",
+    "New Spells available: Nightmare's Grasp, Dark Domain."
+  ],
+  "Academic": ["Learn an additional language. Gain +2 modifier on Analyze checks related to scholarly knowledge."],
+  "Angelic Blood": ["Your HP and DP gain resistance to Radiant damage. +2 modifier on Endure saves against instant-kill effects."],
+  "Animal Ally": ["Befriend a small or tiny Beast as a loyal companion. It follows your commands but does not fight for you unless made a Companion."],
+  "Animal Friendship": ["You can speak with Beasts. When you communicate with a Beast, it understands you and you understand it."],
+  "Backseat Braining": ["When an ally within 30 ft makes a Wits-based check, use a Free Action to grant them a +2 modifier."],
+  "Caster Initiate": ["You learn one Rank 0 Spell from any Study. You can cast it using Wits or Empathy as your spellcasting attribute."],
+  "Demonic Blood": ["Your HP gains resistance to Necrotic damage. +2 modifier on Insight saves against being Charmed or Frightened."],
+  "Field Medic": ["Bandage or Galvanize without a medical kit (within 5 ft). +2 modifier on Medical checks."],
+  "Full Dodge": ["Once per round, when targeted by an attack or effect, use a Reaction to gain the benefits of the Dodge action against that specific attack."],
+  "Heckler": ["Quick action: Taunt a creature within 30 ft - they make an Insight save or gain -1 modifier on attacks against creatures other than you."],
+  "Inspiring": ["Quick action: inspire an ally within 30 ft - they gain +2 modifier on their next check. Recharges on Intermission."],
+  "Intimidating": ["+2 modifier on Intimidate checks. Once per Intermission, a successful Intimidate check imposes -1 on the target's attacks until your next turn."],
+  "Keen Eyes": ["Once per turn as a Free action: attempt to spot Hidden creatures within 30 ft. +2 modifier on Scout checks."],
+  "Linguist": ["Learn two additional languages of your choice."],
+  "Look Over There": ["Quick action: one creature within 30 ft makes an Insight save or loses their Reaction until the start of your next turn."],
+  "Luck of the Gods": ["Once per Full Rest: after rolling any dice, reroll all of them and take the new result."],
+  "Master Spy": ["+2 modifier on Hide and Manipulate checks. Pick locks and disable traps with Finesse (no kit required)."],
+  "Min Max": ["Choose one Attribute. All checks using that Attribute as the highest Rank in the dice pool gain a +1 modifier."],
+  "Mobile": ["Your Speed increases by 10 feet."],
+  "Naturally Gifted": ["Choose one Skill. That Skill's Rank increases by 1 (up to the normal cap)."],
+  "Skilled": ["Gain 2 additional Skill Points to spend immediately."],
+  "Sneaky": ["+2 modifier on Hide checks. When you attack a creature unaware of you, your first attack gains a +1 modifier."],
+  "Steady Hands": ["+2 modifier on Finesse checks. Ignore penalties for using fine tools in stressful situations."],
+  "Steel Body": ["Your max DP increases by 4."],
+  "Steel Mind": ["Your max MP increases by 4."],
+  "Steel Muscles": ["Your max HP increases by 4."],
+  "Steel Nerves": ["+2 modifier on Endure saves and checks to resist Conditions."],
+  "Strong Arm": ["+2 modifier on Might checks. When you Push or Shove a creature, the effect distance increases by 5 feet."],
+  "Sturdy": ["When you would gain the Prone Condition from an attack, use a Reaction to prevent it."],
+  "Vigilant": ["You cannot be Surprised. +2 modifier on initiative checks."],
+  "Warfare Initiate": ["Learn one Rank 1 Martial Talent of your choice, even if you do not normally have access to Martial Talents."],
+};
+
+
+// -- Talent Lists -------------------------------------------------------;
+const STUDY_SPELLS = {
+  'Study of Aeromancy': {
+    rank0: [
+      {name:'Jolt',            study:'Aeromancy', pl:'-',  range:'15-ft. line', ct:'Stan.',  shape:'-', dur:'instant',  focus:false},
+      {name:'Bellowing Shout', study:'Aeromancy', pl:'-',  range:'Self',        ct:'Quick',  shape:'-', dur:'instant',  focus:false},
+    ],
+    rank1: [
+      {name:'Lightning Arc',   study:'Aeromancy', pl:'3',  range:'40 ft.',      ct:'Stan.',  shape:'-', dur:'instant',  focus:false},
+      {name:'Fast as Light',   study:'Aeromancy', pl:'-',  range:'Touch',       ct:'Quick',  shape:'-', dur:'instant',  focus:false},
+    ],
+  },
+  'Study of Blood': {
+    rank0: [
+      {name:'Vampiric Slash',  study:'Blood', pl:'-',  range:'5 ft.',   ct:'Stan.',  shape:'-', dur:'instant',  focus:false},
+      {name:'Infatuate',       study:'Blood', pl:'-',  range:'10 ft.',  ct:'Quick',  shape:'-', dur:'instant',  focus:false},
+    ],
+    rank1: [
+      {name:'Enthrall Person', study:'Blood', pl:'0',  range:'30 ft.',  ct:'Stan.',  shape:'-', dur:'8 Hours',  focus:true},
+      {name:'Infuse Confuse',  study:'Blood', pl:'0',  range:'60 ft.',  ct:'Quick',  shape:'-', dur:'instant',  focus:false},
+    ],
+  },
+  'Study of Contagion': {
+    rank0: [
+      {name:'Acid Dart',       study:'Contagion', pl:'-',  range:'30 ft.',  ct:'Stan.',  shape:'-', dur:'instant',  focus:false},
+      {name:'Sicken Pulse',    study:'Contagion', pl:'-',  range:'20 ft.',  ct:'React',  shape:'-', dur:'instant',  focus:false},
+    ],
+    rank1: [
+      {name:'Toxic Wave',      study:'Contagion', pl:'3',  range:'Self',    ct:'Stan.',  shape:'-', dur:'instant',  focus:false},
+      {name:'Witherplague',    study:'Contagion', pl:'0',  range:'60 ft.',  ct:'Stan.',  shape:'-', dur:'instant',  focus:false},
+    ],
+  },
+  'Study of Cryomancy': {
+    rank0: [
+      {name:'Sculpt Ice',      study:'Cryomancy', pl:'-',  range:'20 ft.',   ct:'Stan.',  shape:'-', dur:'instant',  focus:false},
+      {name:'Ice Spear',       study:'Cryomancy', pl:'-',  range:'60 ft.',   ct:'Stan.',  shape:'-', dur:'instant',  focus:false},
+    ],
+    rank1: [
+      {name:'Ice Barrier',     study:'Cryomancy', pl:'-',  range:'Self',     ct:'React',  shape:'-', dur:'instant',  focus:false},
+      {name:'Daggers of Ice',  study:'Cryomancy', pl:'3',  range:'120 ft.',  ct:'Stan.',  shape:'-', dur:'instant',  focus:false},
+    ],
+  },
+  'Study of Death': {
+    rank0: [
+      {name:'Reaper Scythe',   study:'Death', pl:'-',  range:'Self',    ct:'Quick',  shape:'-', dur:'1 Min',          focus:false},
+      {name:'Recompose',       study:'Death', pl:'-',  range:'Touch',   ct:'Stan.',  shape:'-', dur:'instant',        focus:false},
+    ],
+    rank1: [
+      {name:'Summon Skeleservant', study:'Death', pl:'-',  range:'15 ft.', ct:'Stan.',  shape:'-', dur:'Until Dispelled', focus:true},
+      {name:'Death Speech',    study:'Death', pl:'-',  range:'15 ft.', ct:'Stan.',  shape:'-', dur:'5 Min',           focus:false},
+    ],
+  },
+  'Study of Displacement': {
+    rank0: [
+      {name:'Pocketswap',      study:'Displacement', pl:'-',  range:'5 ft.',   ct:'Stan.',  shape:'-', dur:'instant', focus:false},
+      {name:'Infini Pocket',   study:'Displacement', pl:'-',  range:'Touch',   ct:'Quick',  shape:'-', dur:'1 Week',  focus:false},
+    ],
+    rank1: [
+      {name:'Body Swap',       study:'Displacement', pl:'-',  range:'30 ft.',  ct:'Quick',  shape:'-', dur:'instant', focus:false},
+      {name:'Minor Portals',   study:'Displacement', pl:'-',  range:'30 ft.',  ct:'Stan.',  shape:'-', dur:'1 Min',   focus:true},
+    ],
+  },
+  'Study of Divinity': {
+    rank0: [
+      {name:'Blessing of Protection', study:'Divinity', pl:'-',  range:'10 ft.',  ct:'React',  shape:'-', dur:'instant', focus:false},
+      {name:'Searing Flare',   study:'Divinity', pl:'-',  range:'60 ft.',  ct:'Stan.',  shape:'-', dur:'instant', focus:false},
+    ],
+    rank1: [
+      {name:'Vengeful Smite',  study:'Divinity', pl:'-',  range:'Self',    ct:'Quick',  shape:'-', dur:'1 Min',   focus:false},
+      {name:'Blessing of Pacifism', study:'Divinity', pl:'-',  range:'15 ft.',  ct:'Stan.',  shape:'-', dur:'1 Min',   focus:false},
+    ],
+  },
+  'Study of Geomancy': {
+    rank0: [
+      {name:'Earth Bend',      study:'Geomancy', pl:'-',  range:'30 ft.',  ct:'Stan.',  shape:'-', dur:'instant',  focus:false},
+      {name:'Rock Catapault',  study:'Geomancy', pl:'-',  range:'60 ft.',  ct:'Stan.',  shape:'-', dur:'instant',  focus:false},
+    ],
+    rank1: [
+      {name:'Repair Minerals', study:'Geomancy', pl:'4',  range:'Touch',   ct:'Stan.',  shape:'-', dur:'instant',  focus:false},
+      {name:'Spiked Terrain',  study:'Geomancy', pl:'-',  range:'60 ft.',  ct:'Stan.',  shape:'-', dur:'1 Min',    focus:false},
+    ],
+  },
+  'Study of Illusion': {
+    rank0: [
+      {name:'Lesser Illusion', study:'Illusion', pl:'-',  range:'30 ft.',  ct:'Stan.',  shape:'-', dur:'1 Min',   focus:false},
+      {name:'Fashionate',      study:'Illusion', pl:'-',  range:'Touch',   ct:'Stan.',  shape:'-', dur:'1 Hour',  focus:false},
+    ],
+    rank1: [
+      {name:'Greater Illusion',study:'Illusion', pl:'0',  range:'60 ft.',  ct:'Stan.',  shape:'-', dur:'1 Hour',  focus:true},
+      {name:'Create Disguise', study:'Illusion', pl:'-',  range:'Self',    ct:'Stan.',  shape:'-', dur:'1 Hour',  focus:false},
+    ],
+  },
+  'Study of Pyromancy': {
+    rank0: [
+      {name:'Dancing Flame',   study:'Pyromancy', pl:'-',  range:'30 ft.',   ct:'Stan.',  shape:'-',              dur:'1 Hour',  focus:false},
+      {name:'Fire Ray',        study:'Pyromancy', pl:'-',  range:'60 ft.',   ct:'Stan.',  shape:'-',              dur:'instant', focus:false},
+    ],
+    rank1: [
+      {name:'Burst Self',      study:'Pyromancy', pl:'3',  range:'Self',     ct:'Stan.',  shape:'5-ft. radius',  dur:'instant', focus:false},
+      {name:'Fire Missile',    study:'Pyromancy', pl:'4',  range:'120 ft.',  ct:'Stan.',  shape:'-',              dur:'instant', focus:false},
+    ],
+  },
+  'Study of Recovery': {
+    rank0: [
+      {name:'Transfer Life',   study:'Recovery', pl:'-',  range:'Touch',   ct:'Stan.',  shape:'-', dur:'instant', focus:false},
+      {name:'Dislocate',       study:'Recovery', pl:'-',  range:'5 ft.',   ct:'Stan.',  shape:'-', dur:'instant', focus:false},
+    ],
+    rank1: [
+      {name:'Reinvigorate',    study:'Recovery', pl:'4',  range:'Touch',   ct:'Stan.',  shape:'-', dur:'instant', focus:false},
+      {name:'Calm Emotions',   study:'Recovery', pl:'4',  range:'Touch',   ct:'Stan.',  shape:'-', dur:'instant', focus:false},
+    ],
+  },
+  'Study of Shadows': {
+    rank0: [
+      {name:'Feed Fear',           study:'Shadows', pl:'-',  range:'15 ft.',   ct:'Quick',  shape:'-',                   dur:'instant',  focus:false},
+      {name:'Manipulate Darkness', study:'Shadows', pl:'-',  range:'30 ft.',   ct:'Stan.',  shape:'-',                   dur:'instant',  focus:false},
+    ],
+    rank1: [
+      {name:'Terrifying Gloom',    study:'Shadows', pl:'-',  range:'120 ft.',  ct:'Stan.',  shape:'15-ft. radius sphere', dur:'10 Min',   focus:true},
+      {name:'Fall',                study:'Shadows', pl:'0',  range:'60 ft.',   ct:'Stan.',  shape:'-',                   dur:'instant',  focus:false},
+    ],
+  },
+};
+
+
+async function exportPDF() {
+  const btn = document.getElementById('export-btn');
+  btn.disabled = true;
+  btn.textContent = 'Generating PDF...';
+  try {
+    // Fetch the PDF template
+    const pdfBytes = await fetch('Character_Sheet_Form_Fill.pdf').then(r => r.arrayBuffer());
+    const { PDFDocument } = PDFLib;
+    const pdf = await PDFDocument.load(pdfBytes, { ignoreEncryption: true });
+    const form = pdf.getForm();
+
+    // For mixed lineage, pull stats from the Features lineage
+    const featuresLineageName = ch.mixedLineage ? (ch.mixedAssignment.features || ch.mixedLineages[0]) : ch.lineage;
+    const lg = LINEAGES.find(l=>l.name===featuresLineageName) || {};
+    const allSkills = {};
+    for (const skills of Object.values(SKILLS)) skills.forEach(s => { allSkills[s.key] = ch.skills[s.key]||0; });
+
+    // Helper — sanitize to WinAnsi-safe ASCII
+    const winansi = s => String(s||'').replace(/[\u0080-\uffff]/g, c => {
+      const map = {'\u2264':'<=','\u2265':'>=','\u2014':'-','\u2013':'-','\u2500':'-',
+                   '\u2019':"'",'\u2018':"'",'\u201c':'"','\u201d':'"','\u2026':'...',
+                   '\u00e9':'e','\u00e8':'e','\u00e0':'a','\u00e2':'a','\u00ea':'e',
+                   '\u00ee':'i','\u00f4':'o','\u00fb':'u','\u00fc':'u','\u00e7':'c'};
+      return map[c] || '';
+    });
+    const set = (fieldName, val) => {
+      try { form.getTextField(fieldName).setText(winansi(val)); } catch(e) {}
+    };
+    const setCheck = (fieldName, checked) => {
+      try {
+        const f = form.getCheckBox(fieldName);
+        if (checked) f.check(); else f.uncheck();
+      } catch(e) {
+        try {
+          const f = form.getButton(fieldName);
+          f.setImage && f.setImage('');
+        } catch(e2) {}
+      }
+    };
+
+    // Page 1 - Identity
+    set('Character Name', ch.name);
+    set('JOB', ch.cls);
+    // Spellcasting attribute: Wits for Magi, Empathy for Druid
+    const clsData = CLASSES.find(c => c.name === ch.cls);
+    if (clsData?.spellcasting) {
+      set('spell att', clsData.spellcasting);
+    }
+    set('SPECIALTY', ch.specialty);
+    // Lineage name — show both if Mixed
+    const lineagePDFName = ch.mixedLineage && ch.mixedLineages.length === 2
+      ? ch.mixedLineages.join(' / ')
+      : (ch.lineage || '');
+    set('LINEAGE', lineagePDFName);
+    set('LEVEL', ch.level||1);
+    set('XP', 0);
+    // If mixed lineage with Fueglin Small and Nimble, force Small
+    // Undead: size comes from the Repurposed lineage (not Undead's own 'Varies')
+    let effectiveSize = lg.size || '';
+    if (ch.mixedForcedSmall) {
+      effectiveSize = 'Small';
+    } else if (featuresLineageName === 'Undead' && ch.undeadRepurposedLineage) {
+      const repLgSize = LINEAGES.find(l => l.name === ch.undeadRepurposedLineage);
+      const repSize = repLgSize?.size || '';
+      // Human/Ozonian use sizeChoice; others use their defined size
+      effectiveSize = (ch.undeadRepurposedLineage === 'Humans' || ch.undeadRepurposedLineage === 'Ozonian')
+        ? (ch.sizeChoice || repSize)
+        : repSize;
+    } else if (ch.sizeChoice && (featuresLineageName === 'Humans' || featuresLineageName === 'Ozonian')) {
+      effectiveSize = ch.sizeChoice;
+    }
+    set('SIZE', effectiveSize);
+    const baseSpeakLangs = lg.langs?.speak || [];
+    const baseReadLangs  = lg.langs?.read  || [];
+    const extraSpeak = ch.extraLanguagePicks?.filter(l=>l) || [];
+    const extraRead  = ch.extraLanguageReads?.filter(l=>l) || [];
+    // Fixed extras (ESL, Beasts)
+    const opt = ch.extraLanguage ? EXTRA_LANGUAGE_OPTIONS.find(o=>o.name===ch.extraLanguage) : null;
+    const fixedSpeak = opt?.fixed?.speak || [];
+    const allSpeak   = [...new Set([...baseSpeakLangs, ...extraSpeak, ...fixedSpeak])];
+    const allRead    = [...new Set([...baseReadLangs,  ...extraRead])];
+    set('LANGUAGES',      allSpeak.join(', '));
+    set('LANGUAGES read', allRead.join(', '));
+    set('SPEED', lg.speed ? lg.speed+' ft' : '30 ft');
+
+    // Attributes
+    set('STRENGTH',  ch.attrs.STR||0);
+    set('AGILITY',   ch.attrs.AGI||0);
+    set('WITS',      ch.attrs.WIT||0);
+    set('EMPATHY',   ch.attrs.EMP||0);
+
+    // Skills
+    set('Brawl',      allSkills.Brawl||0);
+    set('Endure',     allSkills.Endure||0);
+    set('Intimidate', allSkills.Intimidate||0);
+    set('Might',      allSkills.Might||0);
+    set('Finesse',    allSkills.Finesse||0);
+    set('Hide',       allSkills.Hide||0);
+    set('Move',       allSkills.Move||0);
+    set('Shoot',      allSkills.Shoot||0);
+    set('Analyze',    allSkills.Analyze||0);
+    set('Insight',    allSkills.Insight||0);
+    set('Scout',      allSkills.Scout||0);
+    set('Survival',   allSkills.Survival||0);
+    set('Medical',    allSkills.Medical||0);
+    set('Manipulate', allSkills.Manipulate||0);
+    set('Perform',    allSkills.Perform||0);
+    set('Tame',       allSkills.Tame||0);
+
+    // Talents (page 1 table)
+    const allTalents = [ch.specialtyTalent, ...ch.talents.filter(t=>t)];
+    allTalents.slice(0,10).forEach((t,i)=>{ set(`MP Talent name ${i+1}`, t); set(`MP Talent rank ${i+1}`, '1'); });
+
+    // Status points
+    set('HP max', calcHP());  set('HP cur', calcHP());
+    set('MP max', calcMP());  set('MP Cur', calcMP());
+    const dpVal = ch.dp || 0;
+    set('DP max', dpVal);     set('DP Cur', dpVal);
+    set('Sorce Max', calcSP()); set('Sorce Cur', calcSP());
+    set('Recovery Max', ch.level||1); set('Recovery Cur', ch.level||1);
+    set('Specialty max', 0); set('Specialty Cur', 0);
+
+    // CHARACTER NOTES filled below after setSmall is declared
+
+    // Weapons — auto-fill from gear selections
+    const gearValsForWeapons = Object.values(ch.gearSelections || {}).filter(v => v);
+    const weaponEntries = [];
+    const seenWeaponNames = new Set();
+    gearValsForWeapons.forEach(item => {
+      // Case-insensitive lookup: try exact, then title-case, then by lowercased key match
+      const wExact = WEAPON_DATA[item];
+      const wTitle = WEAPON_DATA[item.split(' ').map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' ')];
+      const wLower = Object.keys(WEAPON_DATA).find(k => k.toLowerCase() === item.toLowerCase());
+      const w = wExact || wTitle || (wLower ? WEAPON_DATA[wLower] : null);
+      if (w) {
+        const entryName = w.name || item;
+        // Deduplicate: skip if already added (e.g. two Daggers from Sonneteer)
+        if (seenWeaponNames.has(entryName.toLowerCase())) return;
+        seenWeaponNames.add(entryName.toLowerCase());
+        weaponEntries.push({
+          name:     entryName,
+          range:    w.range,
+          mod:      w.mod,
+          damage:   w.damage,
+          pool:     buildDicePool(w.attr, w.skill, w.mod),
+          features: w.features,
+        });
+      }
+    });
+    weaponEntries.slice(0, 5).forEach((w, i) => {
+      const n = i + 1;
+      set('attack name '     + n, w.name);
+      set('attack range '    + n, w.range);
+      set('attack mod '      + n, w.mod);
+      set('attack damage '   + n, w.damage);
+      set('attack pool '     + n, w.pool);
+      set('attack features ' + n, w.features);
+    });
+
+    // Currency
+    set('Silver',  ch.currency?.silver||0);
+    set('Gold',    ch.currency?.gold||0);
+    set('Pluther', ch.currency?.pluther||0);
+
+    // Equipment - smart slot assignment from gear selections
+    // PDF fields: Equipment 1=Armor, 2=Back, 3=Back2, 4=Belt, 5=Belt2, 6=Kit
+    const ARMOR_NAMES_PDF = ['quilted vest','layered plate','light leather','reinforced tunic','brigandine'];
+    // Use gearSelections if populated, otherwise fall back to ch.equip
+    const rawGearVals = Object.values(ch.gearSelections || {}).filter(v => v);
+    const gearVals = rawGearVals.length > 0 ? rawGearVals : ch.equip.filter(v => v);
+    const armorItem  = gearVals.find(v => ARMOR_NAMES_PDF.some(a => v.toLowerCase().includes(a))) || '';
+    const nonBackpack = gearVals.filter(v => !ARMOR_NAMES_PDF.some(a => v.toLowerCase().includes(a)) && v.toLowerCase() !== 'backpack');
+    const isWeaponItem = v => ['sword','bow','axe','mace','dagger','pistol','wand','staff',
+      'crossbow','instrument','hammer','longsword','shortsword','flintlock'].some(w => v.toLowerCase().includes(w));
+    const isKitItem = v => ['alchemy kit','engineer tool kit'].some(k => v.toLowerCase().includes(k));
+
+    // Belt items by keyword
+    const BELT_KEYWORDS = ['short sword','hand axe','hammer','long sword','battle axe',
+      'flintlock pistol','bullet pouch','limb wraps','bolt pouch','dagger','arcane wand',
+      'shortsword','pistol'];
+    const BACK_KEYWORDS = ['small shield','mace','crossbow','short bow','shortbow',
+      'arrow quiver','arcane staff','arcane instrument','longsword','longsword','staff'];
+
+    const slotOf = v => {
+      const lv = v.toLowerCase();
+      if (BACK_KEYWORDS.some(k => lv.includes(k))) return 'back';
+      if (BELT_KEYWORDS.some(k => lv.includes(k))) return 'belt';
+      return 'belt'; // default to belt
+    };
+
+    const kitItem   = nonBackpack.find(isKitItem) || '';
+    const gearItems = nonBackpack.filter(v => !isKitItem(v));
+
+    // Special: if Summoner chose Shortbow, add Arrow Quiver
+    const expandedGear = [];
+    gearItems.forEach(v => {
+      expandedGear.push(v);
+      if (v.toLowerCase() === 'shortbow and arrow quiver') { expandedGear[expandedGear.length-1] = 'Shortbow'; expandedGear.push('Arrow Quiver'); }
+    });
+
+    const backItems = expandedGear.filter(v => slotOf(v) === 'back');
+    const beltItems = expandedGear.filter(v => slotOf(v) === 'belt');
+
+    // Fill Back (Equipment 2-3) and Belt (Equipment 4-5)
+    // Overflow rules:
+    //   - Belt overflow → Back slots (if space), else Backpack (Gear Name)
+    //   - Back overflow → Backpack (Gear Name), NOT Belt
+    const backSlots = backItems.slice(0, 2);
+    const backOverflow = backItems.slice(2);       // back items that didn't fit → backpack
+
+    const beltSlots = beltItems.slice(0, 2);
+    let beltOverflow = beltItems.slice(2);          // belt items that didn't fit
+
+    // Belt overflow can use remaining back slots
+    const remainingBackSlots = 2 - backSlots.length;
+    if (remainingBackSlots > 0 && beltOverflow.length > 0) {
+      const promoted = beltOverflow.splice(0, remainingBackSlots);
+      backSlots.push(...promoted);
+    }
+    // Any remaining belt overflow → backpack
+    const backpackItems = [...backOverflow, ...beltOverflow];
+
+    set('Equipment 1', armorItem);
+    set('Equipment 2', backSlots[0]||'');
+    set('Equipment 3', backSlots[1]||'');
+    set('Equipment 4', beltSlots[0]||'');
+    set('Equipment 5', beltSlots[1]||'');
+    set('Equipment 6', kitItem);  // Kit slot
+
+    // Overflow items → Gear Name slots (backpack inventory on page 2)
+    backpackItems.slice(0, 16).forEach((item, i) => set('Gear Name ' + (i+1), item));
+
+    // Page 2 - Lifepath
+    set('Upbringing',               ch.lifepath.upbringing||ch.lifepathCustom.upbringing||'');
+    set('Culture',                  ch.lifepath.culture||ch.lifepathCustom.culture||'');
+    set('Personality',              ch.lifepath.personality||ch.lifepathCustom.personality||'');
+    set('Value Most',               ch.lifepath.value||ch.lifepathCustom.value||'');
+    set('What Upsets You',          ch.lifepath.upset||ch.lifepathCustom.upset||'');
+    set('How you approach Decisions', ch.lifepath.decisions||ch.lifepathCustom.decisions||'');
+    set('How you view others',      ch.lifepath.viewOfOthers||ch.lifepathCustom.viewOfOthers||'');
+
+    // Notable characters
+    ch.notable.slice(0,10).forEach((n,i)=> set(`Notable Char ${i+1}`, n));
+
+    // Backpack slots (generic)
+    const bpItems = ch.equip.slice(6)||[];
+    bpItems.slice(0,16).forEach((item,i) => set(`Gear Name ${i+1}`, item||''));
+
+    // Page 3 - Talents (small font size for compact display)
+    // Strip HTML tags from a string (for plain text PDF fields)
+    const stripHtml = s => String(s||'').replace(/<[^>]+>/g,'').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&nbsp;/g,' ').replace(/\s+/g,' ').trim();
+
+    const setSmall = (fieldName, val, size) => {
+      try {
+        const field = form.getTextField(fieldName);
+        const cleanVal = stripHtml(val);
+        // For multiline fields setFontSize may fail - try both approaches
+        try {
+          field.setFontSize(size || 7);
+        } catch(fe) {
+          // Multiline field: patch the /DA (Default Appearance) stream directly
+          try {
+            const widgets = field.acroField.getWidgets();
+            const daStr = '/Helvetica ' + (size||7) + ' Tf 0 g';
+            widgets.forEach(w => {
+              w.setDefaultAppearance(daStr);
+            });
+            field.acroField.setDefaultAppearance(daStr);
+          } catch(da) {}
+        }
+        field.setText(cleanVal);
+      } catch(e) {}
+    };
+    // Backpack fields (must come after setSmall is declared)
+    setSmall('Back and kit features', 'Backpack', 14);
+    setSmall('carry Cur', '8', 14);
+
+    setSmall('LINEAGE BENEFITS',  ch.lineageBenefits||'', 11);
+
+    // Sync notes from textarea and fill CHARACTER NOTES field
+    const notesEl = document.getElementById('char-notes');
+    if (notesEl && notesEl.value) ch.notes = notesEl.value;
+    setSmall('CHARACTER NOTES', ch.notes||'', 9);
+
+    // Spells — fill page 4 if a Study of Sorcery talent was selected
+    const studyTalent = (ch.talents||[]).find(t => t && t.startsWith('Study of'));
+    if (studyTalent && STUDY_SPELLS[studyTalent]) {
+      const study = STUDY_SPELLS[studyTalent];
+      (study.rank0 || []).slice(0, 7).forEach((sp, i) => {
+        const n = i + 1;
+        set('r0sname' + n,     winansi(sp.name));
+        set('r0sstudy' + n,    winansi(sp.study));
+        set('r0srange' + n,    winansi(sp.range));
+        set('r0sct' + n,       winansi(sp.ct));
+        set('r0sshape' + n,    winansi(sp.shape));
+        set('r0sduration' + n, winansi(sp.dur));
+        setSmall('rank0spower' + n, sp.pl === '-' ? '' : sp.pl, 9);
+        if (sp.focus) { try { form.getCheckBox('rk0f' + n).check(); } catch(e) {} }
+      });
+      (study.rank1 || []).slice(0, 7).forEach((sp, i) => {
+        const n = i + 1;
+        set('r1sname' + n,     winansi(sp.name));
+        set('r1sstudy' + n,    winansi(sp.study));
+        set('r1srange' + n,    winansi(sp.range));
+        set('r1sct' + n,       winansi(sp.ct));
+        set('r1sshape' + n,    winansi(sp.shape));
+        set('r1sduration' + n, winansi(sp.dur));
+        setSmall('rank1spower' + n, sp.pl === '-' ? '' : sp.pl, 9);
+        if (sp.focus) { try { form.getCheckBox('rk1f' + n).check(); } catch(e) {} }
+      });
+    }
+    setSmall('SPECIALTY TALENT',  ch.specialtyTalent||'', 11);
+    const talentFields = ['TALENT','TALENT_2','TALENT_3','TALENT_4','TALENT_5','TALENT_6','TALENT_7','TALENT_8','TALENT_9'];
+    ch.talents.filter(t=>t).slice(0,9).forEach((t,i) => {
+      if (i === 0 && TALENT_DATA[t] && TALENT_DATA[t][0]) {
+        // First talent box: show name + Rank 1 description (strip HTML tags)
+        const rank1Text = TALENT_DATA[t][0].replace(/<[^>]+>/g, '').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&nbsp;/g,' ');
+        setSmall(talentFields[i], t + '\nRank 1: ' + rank1Text, 9);
+      } else {
+        setSmall(talentFields[i], t, 11);
+      }
+    });
+    // Also set small font on talent rank fields in the main table
+    for (let ti = 1; ti <= 10; ti++) {
+      setSmall('MP Talent name ' + ti, (ch.talents[ti-1]||''), 11);
+      setSmall('MP Talent rank ' + ti, ch.talents[ti-1] ? '1' : '', 9);
+    }
+
+    const filledBytes = await pdf.save();
+    const blob = new Blob([filledBytes], { type:'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = (ch.name||'character') + '_RoL_Sheet.pdf';
+    a.click();
+    URL.revokeObjectURL(url);
+  } catch(err) {
+    console.error(err);
+    alert('PDF generation failed: ' + err.message + '\n\nMake sure Character_Sheet_Form_Fill.pdf is in the same folder as index.html.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '⬇ Download Character Sheet PDF';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SAVE / LOAD / RESET
+// ═══════════════════════════════════════════════════════════════
+function saveJSON() {
+  const data = {ch, currentStep, savedAt: new Date().toLocaleString()};
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = (ch.name||'character') + '_RoL_progress.json';
+  a.click();
+  // Show save indicator
+  const ind = document.getElementById('save-indicator');
+  if (ind) {
+    ind.textContent = 'Saved at ' + new Date().toLocaleTimeString();
+    ind.style.display = 'inline';
+  }
+}
+
+function loadJSON(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      // Restore ch state
+      Object.keys(data.ch).forEach(k => { ch[k] = data.ch[k]; });
+      // Go to the saved step
+      const targetStep = data.currentStep || 1;
+      initAllSteps();
+      goToStep(targetStep);
+      // Show confirmation
+      const ind = document.getElementById('save-indicator');
+      if (ind && data.savedAt) {
+        ind.textContent = 'Loaded save from ' + data.savedAt;
+        ind.style.display = 'inline';
+      }
+    } catch(err) {
+      alert('Failed to load file: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+function applyStartingGear() {
+  if (!ch.specialty || !STARTING_GEAR[ch.specialty]) return;
+  const gear = STARTING_GEAR[ch.specialty];
+  // Fill equipment slots (armor is slot 0, others go to belt/back)
+  gear.forEach((item, i) => { if (i < 6) ch.equip[i] = item; });
+  renderDetailsStep();
+}
+
+
+const GEAR_OPTIONS = {"Guardian": [["Short sword", "Hand axe", "Hammer"], ["Small shield"], ["Quilted Vest", "Layered Plate Armor"], ["Backpack"]], "Berserker": [["Long sword", "Mace", "Battle axe"], ["Quilted Vest", "Layered Plate armor"], ["Backpack"]], "Engineer": [["Shortsword", "Flintlock pistol"], ["Small shield", "Bullet pouch"], ["Quilted Vest", "Layered Plate armor"], ["Engineer tool kit"], ["Backpack"]], "Pugilist": [["Quilted Vest", "Layered Plate armor"], ["Limb Wraps"], ["Backpack"]], "Sharpshooter": [["Short bow", "Flintlock pistol", "Crossbow"], ["Arrow quiver", "Bolt pouch", "Bullet pouch"], ["Quilted Vest", "Light Leather armor"], ["Backpack"]], "Elemancer": [["Short sword", "Mace", "Battle axe", "Dagger"], ["Quilted Vest", "Light Leather armor"], ["Backpack"]], "Alchemist": [["Short sword", "Short bow"], ["Dagger", "Arrow quiver"], ["Quilted Vest", "Light Leather armor"], ["Alchemy kit"], ["Backpack"]], "Reaver": [["Short sword", "Short bow"], ["Dagger", "Arrow quiver"], ["Quilted Vest", "Light Leather armor"], ["Backpack"]], "Spellweaver": [["Arcane wand", "Arcane staff"], ["Quilted Vest armor"], ["Backpack"]], "Warlock": [["Arcane wand", "Arcane staff"], ["Quilted Vest armor"], ["Backpack"]], "Oracle": [["Arcane wand", "Arcane staff"], ["Quilted Vest armor", "Light Leather armor"], ["Backpack"]], "Witch": [["Arcane wand", "Arcane staff"], ["Quilted Vest armor"], ["Backpack"]], "Shapeshifter": [["Arcane wand", "Longsword"], ["Quilted Vest", "Layered Plate armor"], ["Backpack"]], "Summoner": [["Arcane wand", "Shortbow and Arrow Quiver", "Shortsword"], ["Quilted Vest armor", "Light Leather armor"], ["Backpack"]], "Sonneteer": [["Arcane wand", "Arcane instrument"], ["Dagger"], ["Dagger"], ["Quilted Vest armor"], ["Backpack"]], "Cleric": [["Arcane staff", "Mace"], ["Quilted Vest armor", "Layered Plate armor"], ["Backpack"]]};
+
+const ARMOR_DP_MAP = {"Quilted Vest": 10, "Quilted Vest armor": 10, "Layered Plate Armor": 20, "Layered Plate armor": 20, "Light Leather armor": null, "Reinforced Tunic": 12, "Brigandine armor set": 16};
+
+function renderGearStep() {
+  const el = document.getElementById('gear-step-content');
+  if (!el) return;
+  if (!ch.specialty || !GEAR_OPTIONS[ch.specialty]) {
+    el.innerHTML = '<div class="warn-box">Please choose a Specialty in Step 5 first.</div>';
+    return;
+  }
+  const slots = GEAR_OPTIONS[ch.specialty];
+  const silver = STARTING_GEAR[ch.specialty]?.silver || 20;
+  if (!ch.gearSelections) ch.gearSelections = {};
+  if (!ch.currency.silver) ch.currency.silver = silver;
+
+  // Detect slot types: armor, weapon, other
+  const ARMOR_NAMES = ['Quilted Vest','Quilted Vest armor','Layered Plate Armor','Layered Plate armor',
+                       'Light Leather armor','Reinforced Tunic','Brigandine armor set'];
+  const isArmorSlot = opts => opts.some(o => ARMOR_NAMES.some(a => o.toLowerCase().includes(a.toLowerCase()) || a.toLowerCase().includes(o.toLowerCase().replace(' armor',''))));
+  const isWeaponSlot = (opts, i) => i === 0 || (!isArmorSlot(opts) && opts.some(o =>
+    ['sword','bow','axe','mace','dagger','pistol','wand','staff','crossbow','instrument','hammer'].some(w => o.toLowerCase().includes(w))));
+
+  // Auto-initialize all single-option slots
+  slots.forEach((options, i) => {
+    if (options.length === 1 && !ch.gearSelections[i]) {
+      ch.gearSelections[i] = options[0];
+      ch.equip[i] = options[0];
+    }
+    // Also init multi-option slots to first option if not yet set
+    if (!ch.gearSelections[i]) {
+      ch.gearSelections[i] = options[0];
+      ch.equip[i] = options[0];
+    }
+  });
+  // After init, extract DP
+  extractNumericDP();
+
+  el.innerHTML = `
+    <div class="info-box" style="margin-bottom:20px">
+      <strong>${ch.specialty} Starting Gear</strong> - choose one option per row where multiple are offered.
+    </div>
+    <div style="background:#fff;border:1px solid var(--rule);border-radius:var(--r);padding:16px;margin-bottom:16px">
+      <h3 style="font-family:var(--font-ui);font-size:.95rem;font-weight:700;margin-bottom:14px">Equipment Choices</h3>
+      ${slots.map((options, i) => {
+        const selected = ch.gearSelections[i] || options[0];
+        const armor = isArmorSlot(options);
+        const weapon = !armor && isWeaponSlot(options, i);
+        const label = armor ? 'Armor' : weapon ? `Weapon${i>0?' / Ammo':''}` : 'Other Gear';
+        if (options.length === 1) {
+          return `<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+            <label style="font-family:var(--font-ui);font-size:.82rem;font-weight:700;color:var(--muted);text-transform:uppercase;min-width:80px">${label}</label>
+            <div style="flex:1;padding:8px 12px;background:#f8f7f4;border:1px solid var(--rule);border-radius:6px;font-family:var(--font-ui);font-size:.88rem">${options[0]}</div>
+          </div>`;
+        }
+        return `<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+          <label style="font-family:var(--font-ui);font-size:.82rem;font-weight:700;color:var(--muted);text-transform:uppercase;min-width:80px">${label}</label>
+          <select onchange="updateGearSlot(${i}, this.value)"
+                  style="flex:1;padding:8px 12px;border:1px solid var(--rule);border-radius:6px;font-family:var(--font-ui);font-size:.88rem;background:#fff">
+            ${options.map(opt => `<option value="${opt}" ${selected===opt?'selected':''}>${opt}</option>`).join('')}
+          </select>
+        </div>`;
+      }).join('')}
+    </div>
+    <div style="background:#fff;border:1px solid var(--rule);border-radius:var(--r);padding:16px;margin-bottom:16px">
+      <h3 style="font-family:var(--font-ui);font-size:.95rem;font-weight:700;margin-bottom:8px">Auto DP</h3>
+      <div id="dp-display" style="font-family:var(--font-ui);font-size:.9rem;color:var(--accent-dk)">${getArmorDP()}</div>
+    </div>
+    <div style="background:#fff;border:1px solid var(--rule);border-radius:var(--r);padding:16px">
+      <h3 style="font-family:var(--font-ui);font-size:.95rem;font-weight:700;margin-bottom:8px">Starting Currency</h3>
+      <div style="display:flex;align-items:center;gap:10px;font-family:var(--font-ui)">
+        <span style="font-size:1.2rem;font-weight:700;color:var(--accent-dk)">${silver} Silver</span>
+        <span style="color:var(--muted);font-size:.88rem">automatically granted by your ${ch.specialty} Specialty</span>
+      </div>
+    </div>
+  `;
+}
+
+function updateGearSlot(idx, value) {
+  if (!ch.gearSelections) ch.gearSelections = {};
+  // Check armor restrictions
+  const isArmor = ['Layered Plate Armor','Layered Plate armor'].includes(value);
+  if (isArmor) {
+    const str = ch.attrs.STR || 0;
+    if (str < 2) {
+      alert('Layered Plate Armor requires at least Strength Rank 2. Your current Strength is Rank ' + str + '. Please assign Strength to 2 or higher before selecting this armor.');
+      // Revert to previous or first option
+      const slots = GEAR_OPTIONS[ch.specialty] || [];
+      const options = slots[idx] || [];
+      ch.gearSelections[idx] = options.find(o => !['Layered Plate Armor','Layered Plate armor'].includes(o)) || options[0];
+      ch.equip[idx] = ch.gearSelections[idx];
+      renderGearStep();
+      return;
+    }
+  }
+  ch.gearSelections[idx] = value;
+  ch.equip[idx] = value;
+  // Auto-calculate DP if armor changed
+  const dpText = getArmorDP();
+  const dpEl = document.getElementById('dp-display');
+  if (dpEl) dpEl.textContent = dpText;
+  // Store numeric DP in ch for PDF export
+  extractNumericDP();
+}
+
+function getArmorDP() {
+  if (!ch.gearSelections) return 'Select armor above to see DP.';
+  const vals = Object.values(ch.gearSelections);
+  for (const v of vals) {
+    if (ARMOR_DP_MAP[v] !== undefined) {
+      if (ARMOR_DP_MAP[v] === null) {
+        // Light Leather = Agility × 3
+        const agi = ch.attrs.AGI || 0;
+        const dp  = agi * 3;
+        ch.dp = dp;
+        return `Light Leather Armor: DP = Agility (${agi}) × 3 = ${dp}`;
+      }
+      ch.dp = ARMOR_DP_MAP[v];
+      return `${v}: ${ARMOR_DP_MAP[v]} DP`;
+    }
+  }
+  ch.dp = 0;
+  return 'No armor selected - 0 DP.';
+}
+
+function extractNumericDP() {
+  if (!ch.gearSelections) return;
+  const vals = Object.values(ch.gearSelections);
+  for (const v of vals) {
+    if (ARMOR_DP_MAP[v] !== undefined) {
+      ch.dp = (ARMOR_DP_MAP[v] === null) ? ((ch.attrs.AGI||0) * 3) : ARMOR_DP_MAP[v];
+      return;
+    }
+  }
+  ch.dp = 0;
+}
+
+
+function autoFillGear() {
+  if (!ch.specialty || !STARTING_GEAR[ch.specialty]) return;
+  const items = [...STARTING_GEAR[ch.specialty].items];
+  // Slot 0 = armor, rest go to back/belt in order
+  let slotIdx = 0;
+  items.forEach(item => {
+    if (slotIdx < 6) { ch.equip[slotIdx] = item; slotIdx++; }
+  });
+  renderGearStep();
+}
+
+
+function toggleTalentView(name) {
+  const alreadyPicked = (ch.talents||[]).includes(name);
+  const isMartial  = MARTIAL_TALENTS.includes(name);
+  const isSorcery  = SORCERY_TALENTS.includes(name);
+  const currentMartial  = (ch.talents||[]).find(t => MARTIAL_TALENTS.includes(t));
+  const currentSorcery  = (ch.talents||[]).find(t => SORCERY_TALENTS.includes(t));
+
+  if (alreadyPicked) {
+    // Clicking the already-selected talent: just view it (toggle detail view)
+    ch._viewingTalent = (ch._viewingTalent === name) ? null : name;
+  } else if (isMartial && currentMartial) {
+    // Replace existing martial selection with this one
+    removeTalentByName(currentMartial);
+    addTalentFromView(name);
+    ch._viewingTalent = name;
+  } else if (isSorcery && currentSorcery) {
+    // Replace existing sorcery selection with this one
+    removeTalentByName(currentSorcery);
+    addTalentFromView(name);
+    ch._viewingTalent = name;
+  } else {
+    // Normal select
+    addTalentFromView(name);
+    ch._viewingTalent = name;
+  }
+  renderTalentStep();
+}
+
+function addTalentFromView(name) {
+  if (!ch.talents) ch.talents = Array(9).fill('');
+  // Check limits
+  const isMartial = MARTIAL_TALENTS.includes(name);
+  const isSorcery = SORCERY_TALENTS.includes(name);
+  const isGeneral = GENERAL_TALENTS.includes(name);
+  if (isMartial && ch.talents.filter(t=>MARTIAL_TALENTS.includes(t)).length >= 1) {
+    alert('You can only select 1 Martial Talent at Level 1.'); return;
+  }
+  if (isSorcery && ch.talents.filter(t=>SORCERY_TALENTS.includes(t)).length >= 1) {
+    alert('You can only select 1 Sorcery Talent at Level 1.'); return;
+  }
+  // Warlock: chosen Study becomes Patron's Gift in specialty talent
+  if (isSorcery && ch.specialty === 'Warlock') {
+    ch.specialtyTalent = name + " (Patron's Gift)";
+  }
+  if (isGeneral) {
+    alert('General Talents are not selected during character creation. Only 1 Martial or Sorcery Talent is chosen at Level 1.'); return;
+  }
+  const emptyIdx = ch.talents.findIndex(t => !t);
+  if (emptyIdx === -1) { alert('All talent slots are filled. Remove one first.'); return; }
+  ch.talents[emptyIdx] = name;
+  renderTalentStep();
+}
+
+function removeTalentByName(name) {
+  if (!ch.talents) return;
+  const idx = ch.talents.indexOf(name);
+  if (idx !== -1) { ch.talents[idx] = ''; }
+  if (ch._viewingTalent === name) ch._viewingTalent = null;
+  // If Warlock removes their Study, reset specialty talent
+  if (ch.specialty === 'Warlock' && WARLOCK_STUDIES.includes(name)) {
+    ch.specialtyTalent = SPECIALTY_TALENT_TEXT['Warlock'] || 'Warlock Specialty Talent';
+  }
+  renderTalentStep();
+}
+
+function getTalentDescription(name) {
+  // Returns HTML table of rank info for a talent, rank 1 row highlighted
+  const t = TALENT_DATA[name];
+  if (!t) return `<p style="font-style:italic;color:var(--muted)">Full details in the Realms of Legacy Talents chapter.</p>`;
+
+  let html = `<table style="width:100%;border-collapse:collapse;font-size:.82rem;font-family:var(--font-ui)">
+    <thead><tr>
+      <th style="background:var(--head-bg);color:var(--head-txt);padding:6px 10px;text-align:left;width:70px">Rank</th>
+      <th style="background:var(--head-bg);color:var(--head-txt);padding:6px 10px;text-align:left">Description</th>
+    </tr></thead><tbody>`;
+  t.forEach((row, i) => {
+    const isR1 = i === 0;
+    const bg   = isR1 ? 'background:#fff9c4;font-weight:700' : (i%2===0?'background:#f7f7f7':'background:#fff');
+    html += `<tr style="${bg}">
+      <td style="padding:6px 10px;border-bottom:1px solid var(--rule);vertical-align:top;white-space:nowrap;font-weight:700;color:var(--accent-dk)">Rank ${i+1}${isR1?' ★':''}</td>
+      <td style="padding:6px 10px;border-bottom:1px solid var(--rule);line-height:1.45">${row}</td>
+    </tr>`;
+  });
+  html += '</tbody></table>';
+  return html;
+}
+
+
+function startOver() {
+  if (!confirm('Start over? All progress will be lost.')) return;
+  location.reload();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+function initAllSteps() {
+  // Safe init: only render steps that have been reached, or render defensively
+  renderArrayPicker();
+  if (ch.array !== null) {
+    const aa = document.getElementById('attr-assign');
+    if (aa) { aa.style.display = 'grid'; renderAttrAssign(); }
+  }
+  renderSkillList();
+  renderLineageGrid();
+  if (ch.lineage) {
+    const detail = document.getElementById('lineage-detail');
+    if (detail) { detail.style.display = 'block'; renderLineageDetail(); }
+  }
+  renderClassGrid();
+  if (ch.cls) renderClassSkillChoices();
+  renderSpecialtyGrid();
+  renderLifepath();
+  // Only render step 8 & 9 if their key containers exist
+  if (document.getElementById('talent-browser')) renderTalentStep();
+  if (document.getElementById('notable-slots'))  renderDetailsStep();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  initAllSteps();
+  goToStep(1);
+
+  // Sync live fields on step changes
+  document.getElementById('btn-next').addEventListener('click', () => {
+    if (currentStep === 10) {
+      ch.name    = document.getElementById('char-name').value;
+      ch.level   = +document.getElementById('char-level').value||1;
+
+      ch.notes   = document.getElementById('char-notes').value;
+    }
+  });
+
+  // Re-render dependent steps when navigating back
+  document.querySelectorAll('.prog-step').forEach(el => {
+    el.addEventListener('click', () => {
+      const s = parseInt(el.dataset.step);
+      if (s < currentStep) {
+        if (s === 2) renderSkillList();
+        if (s === 3) renderLineageGrid();
+        if (s === 4) { renderClassGrid(); renderClassSkillChoices(); }
+        if (s === 5) renderSpecialtyGrid();
+        if (s === 6) renderLifepath();
+        if (s === 8) renderTalentStep();
+        if (s === 9) renderDetailsStep();
+      }
+    });
+  });
+});
+</script>
+</body>
+</html>;
+const WEAPON_DATA = {
+  'Short Sword':      {range:'5 ft.', mod:'+1', damage:'6 Slash',  attr:'STR_AGI_HIGH', skill:'Brawl', features:'Balanced'},
+  'Shortsword':       {range:'5 ft.', mod:'+1', damage:'6 Slash',  attr:'STR_AGI_HIGH', skill:'Brawl', features:'Balanced'},
+  'Hand Axe':         {range:'5 ft.', mod:'+1', damage:'4 Slash',  attr:'STR_AGI_HIGH', skill:'Brawl', features:'Balanced, Throwing, Savage'},
+  'Hammer':           {range:'5 ft.', mod:'+1', damage:'4 Blunt',  attr:'STR_AGI_HIGH', skill:'Brawl', features:'Balanced, Throwing, Penetrate'},
+  'Mace':             {range:'5 ft.', mod:'0',  damage:'6 Blunt',  attr:'STR',          skill:'Brawl', features:'Versatile, Penetrate'},
+  'Long Sword':       {range:'5 ft.', mod:'0',  damage:'8 Slash',  attr:'STR',          skill:'Brawl', features:'Versatile'},
+  'Longsword':        {range:'5 ft.', mod:'0',  damage:'8 Slash',  attr:'STR',          skill:'Brawl', features:'Versatile'},
+  'Battle Axe':       {range:'5 ft.', mod:'0',  damage:'6 Slash',  attr:'STR',          skill:'Brawl', features:'Versatile, Savage'},
+  'Limb Wraps':       {name:'Unarmed Strike', range:'5 ft.', mod:'0', damage:'6 Blunt', attr:'STR_AGI_HIGH', skill:'Brawl', features:'none'},
+  'Arcane Staff':     {range:'5 ft.', mod:'0',  damage:'6 Blunt',  attr:'STR_AGI_HIGH', skill:'Brawl', features:'Balanced, Versatile'},
+  'Dagger':           {range:'5 ft.', mod:'+1', damage:'4 Pierce', attr:'STR_AGI_HIGH', skill:'Brawl', features:'Balanced, Throwing, Dueling'},
+  'Crossbow':         {range:'80 ft.', mod:'0', damage:'6 Pierce', attr:'AGI',          skill:'Shoot', features:'Slow Load, Heavy, Savage, Ammo (Bolt Pouch)'},
+  'Shortbow':         {range:'40 ft.', mod:'+1', damage:'6 Pierce', attr:'AGI',         skill:'Shoot', features:'Heavy, Ammo (Arrow Quiver)'},
+  'Shortbow and Arrow Quiver': {name:'Shortbow', range:'40 ft.', mod:'+1', damage:'6 Pierce', attr:'AGI', skill:'Shoot', features:'Heavy, Ammo (Arrow Quiver)'},
+  'Flintlock Pistol': {range:'40 ft.', mod:'+1', damage:'4 Pierce', attr:'AGI',         skill:'Shoot', features:'Slow Load, Penetrate, Ammo (Bullet Pouch)'},
+  'Flintlock pistol': {range:'40 ft.', mod:'+1', damage:'4 Pierce', attr:'AGI',         skill:'Shoot', features:'Slow Load, Penetrate, Ammo (Bullet Pouch)'},
+};
+const DRYVORN_BLOODLINES = [
+  {name:'Ravano',  color:'Red',    damage:'Fire'},
+  {name:'Golgun',  color:'Green',  damage:'Acid'},
+  {name:'Voivern', color:'Black',  damage:'Necrotic'},
+  {name:'Sargon',  color:'Yellow', damage:'Radiant'},
+  {name:'Byvern',  color:'White',  damage:'Frost'},
+  {name:'Thundron',color:'Blue',   damage:'Electric'},
+];
+const LANGUAGE_SCRIPTS = {
+  Fuegi:   'Sylvan',  // Fueglins read Sylvan script
+  Hunon:   'Aquon',   // Humans read Aquon script
+  Prado:   'Sybus',   // Pridae read Sybus script
+  Cosi:    'Etunu',   // Fey read Etunu script
+  Necrosis:'Nether',  // Reapers/Undead read Nether script
+  Demoid:  'Nether',  // Demons read Nether script
+  Solari:  'Eldar',   // Angels read Eldar script
+  Godun:   'Eldar',   // Guodons/Titans read Eldar script
+};
+function buildDicePool(attrKey, skillKey, modStr) {
+  let attrVal = 0;
+  if (attrKey === 'STR_AGI_HIGH') {
+    const s = ch.attrs.STR || 0, a = ch.attrs.AGI || 0;
+    attrVal = (s >= a) ? s : a;
+  } else if (attrKey === 'STR') {
+    attrVal = ch.attrs.STR || 0;
+  } else if (attrKey === 'AGI') {
+    attrVal = ch.attrs.AGI || 0;
+  }
+  const skillVal = ch.skills[skillKey] || 0;
+
+  let d8s = 0, d6s = 0;
+  if (attrVal === 0 && skillVal === 0) {
+    d6s = 1;
+  } else {
+    const high = Math.max(attrVal, skillVal);
+    const low  = Math.min(attrVal, skillVal);
+    d8s = low;
+    d6s = high - low;
+  }
+
+  // +1 mod adds 1d6
+  if (modStr === '+1') d6s += 1;
+
+  let parts = [];
+  if (d8s > 0) parts.push(d8s + 'd8');
+  if (d6s > 0) parts.push(d6s + 'd6');
+  return parts.length ? parts.join('+') : '1d6';
+}
+// ===== LEVEL UP RULES =====
+const LEVEL_TABLE = {
+  1:  {specialty:1, skillCap:2, talentCap:2, special:[]},
+  2:  {specialty:2, skillCap:2, talentCap:2, special:['specialty_rank']},
+  3:  {specialty:2, skillCap:2, talentCap:2, special:['attr_point']},
+  4:  {specialty:2, skillCap:2, talentCap:3, special:['talent_cap']},
+  5:  {specialty:2, skillCap:3, talentCap:3, special:['skill_cap']},
+  6:  {specialty:3, skillCap:3, talentCap:3, special:['specialty_rank']},
+  7:  {specialty:3, skillCap:3, talentCap:3, special:['attr_point']},
+  8:  {specialty:3, skillCap:3, talentCap:3, special:['bonus_skill']},
+  9:  {specialty:3, skillCap:4, talentCap:3, special:['skill_cap']},
+  10: {specialty:3, skillCap:4, talentCap:4, special:['talent_cap']},
+  11: {specialty:4, skillCap:4, talentCap:4, special:['specialty_rank']},
+  12: {specialty:4, skillCap:4, talentCap:4, special:['attr_point']},
+  13: {specialty:4, skillCap:5, talentCap:4, special:['skill_cap']},
+  14: {specialty:4, skillCap:5, talentCap:4, special:['bonus_skill']},
+  15: {specialty:4, skillCap:5, talentCap:4, special:['attr_point']},
+  16: {specialty:4, skillCap:5, talentCap:5, special:['talent_cap']},
+  17: {specialty:4, skillCap:6, talentCap:5, special:['skill_cap']},
+  18: {specialty:5, skillCap:6, talentCap:5, special:['specialty_rank']},
+  19: {specialty:5, skillCap:6, talentCap:5, special:['attr_point']},
+  20: {specialty:5, skillCap:6, talentCap:5, special:['attr_point','bonus_skill']},
+};
+const MAX_ATTR_RANK = 6;
+
+let baseChar = null;
+let eff = null;
+let session = null;
+let currentStep = 0;
+const STEPS = [];
+
+function loadChar(event) {
+  const file = event?.target?.files?.[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      const ch = data.ch || data;
+      if (!ch.cls) throw new Error('Not a valid RoL character file.');
+      if ((ch.level||1) >= 20) { alert('This character is already at the maximum level (20).'); return; }
+      baseChar = data;
+      initEffective();
+      initSession();
+      buildSteps();
+      document.getElementById('load-panel').style.display = 'none';
+      document.getElementById('wizard').style.display = 'block';
+      renderBanner();
+      renderProgress();
+      renderStep();
+    } catch(err) {
+      const el = document.getElementById('load-err');
+      el.textContent = 'Error: ' + err.message;
+      el.style.display = 'block';
+    }
+  };
+  reader.readAsText(file);
+}
+
+function initEffective() {
+  const ch = baseChar.ch || baseChar;
+  eff = JSON.parse(JSON.stringify(ch));
+  (baseChar.levelHistory||[]).forEach(entry => applyEntry(eff, entry));
+  if (!eff.talents) eff.talents = Array(9).fill('');
+  if (!eff.talentRanks) eff.talentRanks = Array(9).fill(1);
+  if (!eff.skills) eff.skills = {};
+  if (!eff.attrs) eff.attrs = {STR:0,AGI:0,WIT:0,EMP:0};
+  if (!eff.hpMax) eff.hpMax = (eff.attrs.STR+eff.attrs.AGI)*2+4;
+  if (!eff.mpMax) eff.mpMax = (eff.attrs.WIT+eff.attrs.EMP)*2+4;
+}
+
+function applyEntry(ch, entry) {
+  if (entry.hpGain) ch.hpMax = (ch.hpMax||0) + entry.hpGain;
+  if (entry.mpGain) ch.mpMax = (ch.mpMax||0) + entry.mpGain;
+  if (entry.skillGains) entry.skillGains.forEach(({key,amount}) => { ch.skills[key]=(ch.skills[key]||0)+amount; });
+  if (entry.attrGain) {
+    ch.attrs[entry.attrGain.key] = (ch.attrs[entry.attrGain.key]||0)+1;
+    if (['STR','AGI'].includes(entry.attrGain.key)) ch.hpMax = (ch.hpMax||0)+2;
+    if (['WIT','EMP'].includes(entry.attrGain.key)) ch.mpMax = (ch.mpMax||0)+2;
+  }
+  if (entry.talentGain) {
+    const {name,isNew} = entry.talentGain;
+    if (isNew) {
+      const ei = ch.talents.findIndex(t=>!t);
+      if (ei !== -1) { ch.talents[ei]=name; ch.talentRanks[ei]=1; }
+    } else {
+      const ti = ch.talents.indexOf(name);
+      if (ti !== -1) ch.talentRanks[ti]=(ch.talentRanks[ti]||1)+1;
+    }
+  }
+  if (entry.level) ch.level = entry.level;
+}
+
+function initSession() {
+  const targetLevel = (eff.level||1)+1;
+  const ld = LEVEL_TABLE[targetLevel];
+  session = {
+    targetLevel, lvlData:ld,
+    statusPoints:7, hpGain:0, mpGain:0,
+    skillPointsTotal: 2+(ld.special.includes('bonus_skill')?1:0),
+    skillPointsSpent:0, skillGains:[],
+    attrGain:null, talentGain:null, notes:'',
+  };
+}
+
+function buildSteps() {
+  STEPS.length=0;
+  STEPS.push('welcome');
+  STEPS.push('status');
+  STEPS.push('skills');
+  if (session.lvlData.special.includes('attr_point')) STEPS.push('attribute');
+  STEPS.push('talent');
+  STEPS.push('summary');
+}
+
+function renderBanner() {
+  const ch = eff;
+  document.getElementById('char-banner').innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+      <div>
+        <div style="font-size:1.1rem;font-weight:700;color:var(--accent-dk)">${ch.name||'Unnamed Hero'}</div>
+        <div style="font-size:.85rem;color:var(--muted)">${ch.cls||''} · ${ch.specialty||''} · ${ch.lineage||''}</div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <span class="stat-badge">Level ${ch.level||1}</span>
+        <span class="stat-badge">→</span>
+        <span class="stat-badge gold">Level ${session.targetLevel}</span>
+        <span class="stat-badge">HP ${ch.hpMax||0}</span>
+        <span class="stat-badge">MP ${ch.mpMax||0}</span>
+        <span class="stat-badge">DP ${ch.dp||0}</span>
+      </div>
+    </div>`;
+}
+
+function renderProgress() {
+  const lbls = {welcome:'Overview',status:'Status',skills:'Skills',attribute:'Attribute',talent:'Talent',summary:'Finish'};
+  document.getElementById('prog-bar').innerHTML = STEPS.map((s,i) => {
+    const cls = i < currentStep ? 'done' : i===currentStep ? 'active' : '';
+    return `<div class="prog-step ${cls}" title="${lbls[s]||s}"></div>`;
+  }).join('');
+}
+
+function renderStep() {
+  const step = STEPS[currentStep];
+  const content = document.getElementById('step-content');
+  const nextBtn = document.getElementById('btn-next');
+  const backBtn = document.getElementById('btn-back');
+  backBtn.style.display = currentStep > 0 ? 'inline-block' : 'none';
+  nextBtn.textContent = step === 'summary' ? '⬇ Download PDF' : 'Next →';
+  nextBtn.onclick = step === 'summary' ? exportPDF : nextStep;
+  const renders = {welcome:renderWelcome, status:renderStatus, skills:renderSkills,
+                   attribute:renderAttribute, talent:renderTalent, summary:renderSummaryStep};
+  content.innerHTML = (renders[step]||(() => ''))();
+}
+
+// ── Welcome ─────────────────────────────────────────────────────────
+function renderWelcome() {
+  const lvl = session.targetLevel, ld = session.lvlData;
+  const prev = LEVEL_TABLE[lvl-1];
+  let specHTML = '';
+  if (ld.special.includes('specialty_rank')) specHTML += `<li>Specialty Talent ranks up to <strong>Rank ${ld.specialty}</strong>.</li>`;
+  if (ld.special.includes('attr_point')) specHTML += `<li>Gain <strong>1 Attribute Point</strong> (max rank 6). Raising STR/AGI gives +2 Max HP; WIT/EMP gives +2 Max MP.</li>`;
+  if (ld.special.includes('talent_cap')) specHTML += `<li>Talent Cap increases from ${prev.talentCap} to <strong>${ld.talentCap}</strong>.</li>`;
+  if (ld.special.includes('skill_cap'))  specHTML += `<li>Skill Cap increases from ${prev.skillCap} to <strong>${ld.skillCap}</strong>.</li>`;
+  if (ld.special.includes('bonus_skill')) specHTML += `<li>Gain a <strong>bonus Skill Point</strong> this level (${session.skillPointsTotal} total).</li>`;
+  return `<div class="card">
+    <h2>Level ${lvl} Overview</h2>
+    <div class="info-box">Every level: <strong>+7 Status Points</strong> (HP/MP), <strong>${session.skillPointsTotal} Skill Point${session.skillPointsTotal>1?'s':''}</strong>, <strong>1 Talent Point</strong>.</div>
+    ${specHTML ? `<ul style="padding-left:20px;font-size:.9rem;line-height:1.9;margin-top:12px">${specHTML}</ul>` : ''}
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px;font-size:.85rem">
+      <div class="stat-card"><div class="val">${ld.skillCap}</div><div class="lbl">Skill Cap</div></div>
+      <div class="stat-card"><div class="val">${ld.talentCap}</div><div class="lbl">Talent Cap</div></div>
+      <div class="stat-card"><div class="val">${ld.specialty}</div><div class="lbl">Specialty Rank</div></div>
+    </div>
+  </div>`;
+}
+
+// ── Status Points ────────────────────────────────────────────────────
+function renderStatus() {
+  const total=session.statusPoints, hp=session.hpGain, mp=session.mpGain, rem=total-hp-mp;
+  return `<div class="card">
+    <h2>Allocate Status Points</h2>
+    <p style="font-size:.88rem;color:var(--muted);margin-bottom:16px">Distribute <strong>${total} Status Points</strong> between Max HP and Max MP.</p>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:14px">
+      <div class="card" style="flex:1;min-width:170px;border-color:${hp>0?'var(--safe)':'var(--rule)'}">
+        <h3>Max HP <span style="color:var(--safe);text-transform:none;font-size:.9rem">+${hp}</span></h3>
+        <div style="font-size:.82rem;color:var(--muted);margin-bottom:8px">${eff.hpMax||0} → ${(eff.hpMax||0)+hp}</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <button class="sp-btn" onclick="adjSP('hp',-1)" ${hp<=0?'disabled':''}>−</button>
+          <span style="font-size:1.3rem;font-weight:700;min-width:28px;text-align:center">${hp}</span>
+          <button class="sp-btn" onclick="adjSP('hp',1)" ${rem<=0?'disabled':''}>+</button>
+        </div>
+      </div>
+      <div class="card" style="flex:1;min-width:170px;border-color:${mp>0?'var(--accent)':'var(--rule)'}">
+        <h3>Max MP <span style="color:var(--accent);text-transform:none;font-size:.9rem">+${mp}</span></h3>
+        <div style="font-size:.82rem;color:var(--muted);margin-bottom:8px">${eff.mpMax||0} → ${(eff.mpMax||0)+mp}</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <button class="sp-btn" onclick="adjSP('mp',-1)" ${mp<=0?'disabled':''}>−</button>
+          <span style="font-size:1.3rem;font-weight:700;min-width:28px;text-align:center">${mp}</span>
+          <button class="sp-btn" onclick="adjSP('mp',1)" ${rem<=0?'disabled':''}>+</button>
+        </div>
+      </div>
+    </div>
+    <div class="${rem===0?'good-box':'warn-box'}">${rem} point${rem!==1?'s':''} remaining.${rem===0?' ✓ All allocated.':''}</div>
+  </div>`;
+}
+function adjSP(t,d) {
+  if (t==='hp') {
+    const n=session.hpGain+d;
+    if(n<0||n>session.statusPoints-session.mpGain) return;
+    session.hpGain=n;
+  } else {
+    const n=session.mpGain+d;
+    if(n<0||n>session.statusPoints-session.hpGain) return;
+    session.mpGain=n;
+  }
+  renderStep();
+}
+
+// ── Skills ───────────────────────────────────────────────────────────
+function renderSkills() {
+  const cap=session.lvlData.skillCap, total=session.skillPointsTotal, spent=session.skillPointsSpent, rem=total-spent;
+  const allSkills=Object.entries(SKILLS).flatMap(([ak,skills])=>skills.map(s=>({...s,attrKey:ak})));
+  const attrColors={STR:'#dc2626',AGI:'#d97706',WIT:'#7c3aed',EMP:'#15803d'};
+  const rows = allSkills.map(s => {
+    const cur=eff.skills[s.key]||0;
+    const gained=session.skillGains.filter(g=>g.key===s.key).reduce((a,b)=>a+b.amount,0);
+    const total_r=cur+gained;
+    return `<div class="skill-row">
+      <div style="flex:1"><span style="font-weight:600">${s.name}</span>
+        <span style="font-size:.7rem;color:${attrColors[s.attrKey]};margin-left:5px;font-weight:700">${s.attrKey}</span>
+        ${total_r>=cap?'<span class="tag tag-grey">CAP</span>':''}
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button class="sp-btn" onclick="adjSkill('${s.key}',-1)" ${gained>0?'':'disabled'}>−</button>
+        <span style="font-weight:700;font-size:1rem;min-width:20px;text-align:center">${total_r}</span>
+        <button class="sp-btn" onclick="adjSkill('${s.key}',1)" ${(rem>0&&total_r<cap)?'':'disabled'}>+</button>
+        ${gained>0?`<span style="font-size:.72rem;color:var(--safe);font-weight:700">+${gained}</span>`:'<span style="opacity:0">+0</span>'}
+      </div>
+    </div>`;
+  }).join('');
+  return `<div class="card">
+    <h2>Spend Skill Points</h2>
+    <p style="font-size:.88rem;color:var(--muted);margin-bottom:8px">Distribute <strong>${total} Skill Point${total>1?'s':''}</strong>. Skill Cap: <strong>${cap}</strong>.</p>
+    <div class="${rem===0?'good-box':'info-box'}" style="margin-bottom:12px">${rem} point${rem!==1?'s':''} remaining${rem===0?' ✓':''}.</div>
+    ${rows}
+  </div>`;
+}
+function adjSkill(key,d) {
+  const cap=session.lvlData.skillCap;
+  const cur=eff.skills[key]||0;
+  const gained=session.skillGains.filter(g=>g.key===key).reduce((a,b)=>a+b.amount,0);
+  if (d>0) {
+    if (session.skillPointsSpent>=session.skillPointsTotal||cur+gained>=cap) return;
+    session.skillGains.push({key,amount:1}); session.skillPointsSpent++;
+  } else {
+    if (gained<=0) return;
+    const li=session.skillGains.map((g,i)=>g.key===key?i:-1).filter(i=>i>=0).pop();
+    if(li!==undefined){session.skillGains.splice(li,1);session.skillPointsSpent--;}
+  }
+  renderStep();
+}
+
+// ── Attribute ────────────────────────────────────────────────────────
+function renderAttribute() {
+  const rows = ATTRIBUTES.map(a => {
+    const cur=eff.attrs[a.key]||0;
+    const sel=session.attrGain?.key===a.key;
+    const atMax=cur>=MAX_ATTR_RANK;
+    const hpMp=(a.key==='STR'||a.key==='AGI')?'+2 Max HP':'+2 Max MP';
+    return `<div class="attr-row" style="border-color:${sel?'var(--accent)':atMax?'#e0e0e0':'var(--rule)'};background:${sel?'var(--accent-lt)':'#f8f7f4'}">
+      <div><span style="font-weight:700">${a.name}</span>
+        <span style="font-size:.75rem;color:var(--muted);margin-left:8px">${hpMp}</span>
+        ${atMax?'<span class="tag tag-grey">MAX</span>':''}
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:1.15rem;font-weight:700;color:${sel?'var(--accent-dk)':'var(--muted)'}">${cur} → ${cur+(sel?1:0)}</span>
+        ${!atMax?`<button class="btn ${sel?'btn-primary':'btn-secondary'}" style="padding:6px 14px;font-size:.82rem" onclick="selAttr('${a.key}')">${sel?'✓ Selected':'Select'}</button>`:'<span style="color:#aaa;font-size:.82rem">At max</span>'}
+      </div>
+    </div>`;
+  }).join('');
+  const hpB=session.attrGain&&['STR','AGI'].includes(session.attrGain.key)?2:0;
+  const mpB=session.attrGain&&['WIT','EMP'].includes(session.attrGain.key)?2:0;
+  return `<div class="card">
+    <h2>Raise an Attribute</h2>
+    <p style="font-size:.88rem;color:var(--muted);margin-bottom:14px">Choose one Attribute Rank to raise. Maximum rank: <strong>${MAX_ATTR_RANK}</strong>.</p>
+    ${rows}
+    ${session.attrGain?`<div class="good-box" style="margin-top:10px">✓ ${session.attrGain.name} raised.${hpB?` +${hpB} Max HP.`:''}${mpB?` +${mpB} Max MP.`:''}</div>`
+      :'<div class="warn-box" style="margin-top:10px">Choose an Attribute before continuing.</div>'}
+  </div>`;
+}
+function selAttr(key) {
+  if ((eff.attrs[key]||0)>=MAX_ATTR_RANK) return;
+  session.attrGain = session.attrGain?.key===key ? null : {key, name:ATTRIBUTES.find(a=>a.key===key).name};
+  renderStep();
+}
+
+// ── Talent ───────────────────────────────────────────────────────────
+function renderTalent() {
+  const cap=session.lvlData.talentCap;
+  const cls=eff.cls;
+  const isMartial=(cls==='Fighter'||cls==='Vagabond');
+  const isSorcery=(cls==='Magi'||cls==='Druid');
+  const isWarlock=eff.specialty==='Warlock';
+  const myTalents=(eff.talents||[]).map((t,i)=>t?{name:t,rank:eff.talentRanks?.[i]||1}:null).filter(Boolean);
+  const myNames=myTalents.map(t=>t.name);
+  const martialPool = isMartial ? MARTIAL_TALENTS : [];
+  const sorceryPool = isSorcery ? (isWarlock?WARLOCK_STUDIES:SORCERY_TALENTS_ALL) : [];
+  const generalPool = GENERAL_TALENTS;
+  const sel=session.talentGain;
+
+  const myHTML = myTalents.length ? myTalents.map(t => {
+    const atCap=t.rank>=cap;
+    const canRU=!atCap&&(martialPool.includes(t.name)||sorceryPool.includes(t.name)||generalPool.includes(t.name));
+    const isSel=sel&&!sel.isNew&&sel.name===t.name;
+    return `<div class="opt-chip ${isSel?'sel-green':''} ${!canRU&&!isSel?'dim':''}"
+      onclick="${canRU||isSel?`selTalentRU('${t.name.replace(/'/g,"\\'")}')`:''}"
+      style="cursor:${canRU?'pointer':'default'}">
+      ${t.name} <span style="font-size:.7rem;opacity:.7">R${t.rank}${isSel?'→'+(t.rank+1):''}</span>
+      ${atCap?'<span class="tag tag-grey">CAP</span>':canRU&&!isSel?'<span class="tag tag-gold">rank up</span>':''}
+    </div>`;
+  }).join('') : '<span style="color:var(--muted);font-size:.85rem">No talents yet.</span>';
+
+  const makeNew = (pool,lbl) => {
+    if (!pool.length) return '';
+    const chips = pool.filter(t=>!myNames.includes(t)).map(t => {
+      const isSel=sel?.isNew&&sel.name===t;
+      return `<div class="opt-chip ${isSel?'sel':''}" onclick="selTalentNew('${t.replace(/'/g,"\\'")}','${lbl}')">${t}</div>`;
+    }).join('');
+    return chips ? `<div style="margin-bottom:12px"><h3 style="margin-bottom:6px">${lbl}</h3><div>${chips}</div></div>` : '';
+  };
+
+  const descHTML = sel?.name ? (() => {
+    const data=TALENT_DATA[sel.name];
+    if (!data) return `<p style="color:var(--muted)">See Talents chapter.</p>`;
+    const myRank=myTalents.find(t=>t.name===sel.name)?.rank||0;
+    const showR=myRank>0?myRank+1:1;
+    return `<table class="rtable"><thead><tr><th>Rank</th><th>Description</th></tr></thead><tbody>
+      ${data.map((row,i)=>`<tr class="${i+1===showR?'hl':''}"><td>R${i+1}${i+1===showR?' ★':''}</td><td>${row.replace(/<[^>]+>/g,'').replace(/&amp;/g,'&')}</td></tr>`).join('')}
+    </tbody></table>`;
+  })() : '';
+
+  return `<div class="card">
+    <h2>Spend Talent Point</h2>
+    <p style="font-size:.88rem;color:var(--muted);margin-bottom:12px">
+      Rank up an existing Talent (up to Talent Cap <strong>${cap}</strong>) or learn a new Talent at Rank 1.
+    </p>
+    <div style="margin-bottom:16px"><h3 style="margin-bottom:8px">Your Talents (tap to rank up)</h3>${myHTML}</div>
+    ${makeNew(martialPool,'New Martial Talent')}
+    ${makeNew(sorceryPool,isWarlock?'New Study (Patron\'s Gift)':'New Sorcery Talent')}
+    ${makeNew(generalPool,'New General Talent')}
+    ${sel?`<div class="talent-desc"><div style="font-weight:700;font-size:.95rem;color:var(--accent-dk);margin-bottom:8px">${sel.name} ${sel.isNew?'<span class="tag tag-gold">New — R1</span>':`<span class="tag tag-green">Rank Up → R${(myTalents.find(t=>t.name===sel.name)?.rank||1)+1}</span>`}</div>${descHTML}</div>
+      <div class="good-box" style="margin-top:10px">✓ Selection made.</div>`
+      :'<div class="warn-box" style="margin-top:10px">Choose a Talent before continuing.</div>'}
+  </div>`;
+}
+function selTalentRU(name) {
+  session.talentGain = session.talentGain?.name===name ? null : {name, isNew:false};
+  renderStep();
+}
+function selTalentNew(name,type) {
+  session.talentGain = session.talentGain?.name===name ? null : {name, isNew:true, type};
+  renderStep();
+}
+
+// ── Summary ──────────────────────────────────────────────────────────
+function aggregateGains(gains) {
+  const m={};
+  gains.forEach(({key,amount})=>{m[key]=(m[key]||0)+amount;});
+  return Object.entries(m).map(([key,amount])=>({key,amount}));
+}
+
+function buildHistoryEntry() {
+  const s=session;
+  const hpB=s.attrGain&&['STR','AGI'].includes(s.attrGain.key)?2:0;
+  const mpB=s.attrGain&&['WIT','EMP'].includes(s.attrGain.key)?2:0;
+  return {
+    level:s.targetLevel,
+    hpGain:s.hpGain+hpB, mpGain:s.mpGain+mpB,
+    skillGains:aggregateGains(s.skillGains),
+    attrGain:s.attrGain||null,
+    talentGain:s.talentGain||null,
+    notes:s.notes,
+  };
+}
+
+function buildUpdatedChar() {
+  const ch=JSON.parse(JSON.stringify(eff));
+  applyEntry(ch, buildHistoryEntry());
+  ch.specialtyRank=session.lvlData.specialty;
+  // Update specialty talent text based on new rank
+  if (ch.specialty && SPECIALTY_TALENT_TEXT[ch.specialty]) {
+    ch.specialtyTalent = SPECIALTY_TALENT_TEXT[ch.specialty];
+  } else if (ch.specialty) {
+    ch.specialtyTalent = `${ch.specialty} Specialty Talent (Rank ${session.lvlData.specialty})`;
+  }
+  return ch;
+}
+
+function renderSummaryStep() {
+  const s=session, ch=eff, lvl=s.targetLevel;
+  const skillChanges=aggregateGains(s.skillGains);
+  const allSkills=Object.values(SKILLS).flat();
+  const hpB=s.attrGain&&['STR','AGI'].includes(s.attrGain.key)?2:0;
+  const mpB=s.attrGain&&['WIT','EMP'].includes(s.attrGain.key)?2:0;
+  const newHP=(ch.hpMax||0)+s.hpGain+hpB;
+  const newMP=(ch.mpMax||0)+s.mpGain+mpB;
+
+  const changes = [
+    ...skillChanges.map(({key,amount})=>{const sk=allSkills.find(s=>s.key===key); return `${sk?.name||key}: ${ch.skills[key]||0} → ${(ch.skills[key]||0)+amount}`;}),
+    s.attrGain ? `${s.attrGain.name}: ${ch.attrs[s.attrGain.key]||0} → ${(ch.attrs[s.attrGain.key]||0)+1}${hpB?` (+${hpB} Max HP)`:''}${mpB?` (+${mpB} Max MP)`:''}` : null,
+    s.talentGain ? `${s.talentGain.name}: ${s.talentGain.isNew?'New (Rank 1)':'Ranked up'}` : null,
+    s.lvlData.special.includes('specialty_rank') ? `Specialty Talent → Rank ${s.lvlData.specialty}` : null,
+    s.lvlData.special.includes('talent_cap') ? `Talent Cap → ${s.lvlData.talentCap}` : null,
+    s.lvlData.special.includes('skill_cap')  ? `Skill Cap → ${s.lvlData.skillCap}` : null,
+  ].filter(Boolean);
+
+  return `<div class="card">
+    <h2>Level ${lvl} Complete!</h2>
+    <div class="good-box" style="margin-bottom:16px">Review your changes, then save your JSON or export the full PDF sheet.</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+      <div class="stat-card"><div class="val">${newHP}</div><div class="lbl">New Max HP <span style="font-size:.68rem">(was ${ch.hpMax||0})</span></div></div>
+      <div class="stat-card"><div class="val">${newMP}</div><div class="lbl">New Max MP <span style="font-size:.68rem">(was ${ch.mpMax||0})</span></div></div>
+    </div>
+    <ul style="padding-left:18px;font-size:.9rem;line-height:2;margin-bottom:14px">
+      ${changes.map(c=>`<li>${c}</li>`).join('')}
+    </ul>
+    <div style="margin-bottom:14px">
+      <label class="field-label">Notes</label>
+      <textarea rows="3" placeholder="Notes about this level up..." oninput="session.notes=this.value"
+        style="resize:vertical">${s.notes||''}</textarea>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn btn-save" onclick="saveJSON()">💾 Save JSON</button>
+      <button class="btn btn-export" onclick="exportPDF()">⬇ Export PDF Sheet</button>
+    </div>
+    <p style="font-size:.78rem;color:var(--muted);margin-top:10px">
+      The JSON file can be loaded here again to level up further.
+      The PDF is the complete character sheet at Level ${lvl}.
+    </p>
+  </div>`;
+}
+
+// ── Navigation ───────────────────────────────────────────────────────
+function nextStep() {
+  const step=STEPS[currentStep];
+  if (step==='summary') { exportPDF(); return; }
+  if (step==='status'&&(session.statusPoints-session.hpGain-session.mpGain)!==0) { alert('Allocate all '+session.statusPoints+' Status Points first.'); return; }
+  if (step==='skills'&&session.skillPointsSpent<session.skillPointsTotal) { alert('Spend all '+session.skillPointsTotal+' Skill Points first.'); return; }
+  if (step==='attribute'&&!session.attrGain) { alert('Choose an Attribute to raise.'); return; }
+  if (step==='talent'&&!session.talentGain) { alert('Choose a Talent first.'); return; }
+  currentStep++;
+  renderProgress();
+  renderStep();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function prevStep() {
+  if (currentStep>0) { currentStep--; renderProgress(); renderStep(); }
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── Save JSON ────────────────────────────────────────────────────────
+function saveJSON() {
+  const updCh=buildUpdatedChar();
+  const data={...baseChar, ch:updCh, levelHistory:[...(baseChar.levelHistory||[]),buildHistoryEntry()], savedAt:new Date().toLocaleString()};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=(updCh.name||'character')+'_level'+session.targetLevel+'.json';
+  a.click();
+}
+
+const winansi = s => String(s||'').replace(/[\u0080-\uffff]/g,'');
+
+function stripHtml(s) {
+  return String(s||'').replace(/<[^>]+>/g,'').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&nbsp;/g,' ').trim();
+}
+
+function buildDicePoolForChar(attrKey, skillKey, modStr, ch) {
+  let attrVal = 0;
+  if (attrKey === 'STR_AGI_HIGH') {
+    const s = ch.attrs.STR||0, a = ch.attrs.AGI||0;
+    attrVal = (s >= a) ? s : a;
+  } else if (attrKey === 'STR') attrVal = ch.attrs.STR||0;
+  else if (attrKey === 'AGI') attrVal = ch.attrs.AGI||0;
+  const skillVal = ch.skills[skillKey]||0;
+  let d8s=0, d6s=0;
+  if (attrVal===0 && skillVal===0) { d6s=1; }
+  else {
+    const high=Math.max(attrVal,skillVal), low=Math.min(attrVal,skillVal);
+    d8s=low; d6s=high-low;
+  }
+  if (modStr==='+1') d6s+=1;
+  const parts=[];
+  if (d8s>0) parts.push(d8s+'d8');
+  if (d6s>0) parts.push(d6s+'d6');
+  return parts.length ? parts.join('+') : '1d6';
+}
+
+async function exportPDF() {
+  const btn = document.getElementById('btn-next');
+  const origText = btn.textContent;
+  btn.textContent = 'Generating PDF...';
+  btn.disabled = true;
+  try {
+    const ch = buildUpdatedChar();
+    const pdfBytes = await fetch('Character_Sheet_Form_Fill.pdf').then(r => r.arrayBuffer());
+    const { PDFDocument } = PDFLib;
+    const pdf = await PDFDocument.load(pdfBytes, {ignoreEncryption:true});
+    const form = pdf.getForm();
+    const set = (f,v) => { try { form.getTextField(f).setText(winansi(v)); } catch(e) {} };
+    const setCheck = (f,v) => { try { if(v) form.getCheckBox(f).check(); else form.getCheckBox(f).uncheck(); } catch(e) {} };
+    const setSmall = (f,v,sz) => {
+      try {
+        const fld = form.getTextField(f);
+        try { fld.setFontSize(sz||7); } catch(fe) {
+          try {
+            const widgets = fld.acroField.getWidgets();
+            const daStr = '/Helvetica ' + (sz||7) + ' Tf 0 g';
+            widgets.forEach(w => { w.setDefaultAppearance(daStr); });
+            fld.acroField.setDefaultAppearance(daStr);
+          } catch(da) {}
+        }
+        fld.setText(stripHtml(winansi(v)));
+      } catch(e) {}
+    };
+
+    const lg = (window.LINEAGES||[]).find(l=>l.name===ch.lineage)||{};
+    const allSkills = {};
+    Object.values(SKILLS).flat().forEach(s => { allSkills[s.key] = ch.skills[s.key]||0; });
+
+    // Page 1 — Identity
+    set('Character Name', ch.name||'');
+    set('JOB', ch.cls||'');
+    set('SPECIALTY', ch.specialty||'');
+    set('LINEAGE', ch.mixedLineage && ch.mixedLineages?.length===2 ? ch.mixedLineages.join(' / ') : (ch.lineage||''));
+    set('LEVEL', ch.level||1);
+    set('XP', 0);
+    const effSize = ch.sizeChoice && (ch.lineage==='Humans'||ch.lineage==='Ozonian') ? ch.sizeChoice : (lg.size||'');
+    set('SIZE', effSize);
+    set('SPEED', lg.speed ? lg.speed+' ft' : '30 ft');
+    const baseSpeakLangs = lg.langs?.speak||[];
+    const baseReadLangs  = lg.langs?.read||[];
+    const extraSpeak = ch.extraLanguagePicks?.filter(l=>l)||[];
+    const extraRead  = ch.extraLanguageReads?.filter(l=>l)||[];
+    set('LANGUAGES',      [...new Set([...baseSpeakLangs,...extraSpeak])].join(', '));
+    set('LANGUAGES read', [...new Set([...baseReadLangs,...extraRead])].join(', '));
+
+    // Attributes
+    set('STRENGTH', ch.attrs.STR||0);
+    set('AGILITY',  ch.attrs.AGI||0);
+    set('WITS',     ch.attrs.WIT||0);
+    set('EMPATHY',  ch.attrs.EMP||0);
+
+    // Skills
+    ['Brawl','Might','Endure','Intimidate','Move','Hide','Finesse','Shoot',
+     'Analyze','Scout','Insight','Survival','Medical','Manipulate','Perform','Tame']
+    .forEach(k => set(k, allSkills[k]||0));
+
+    // Status points
+    const dpVal = ch.dp||0;
+    set('HP max', ch.hpMax||0); set('HP cur', ch.hpMax||0);
+    set('MP max', ch.mpMax||0); set('MP Cur', ch.mpMax||0);
+    set('DP max', dpVal);       set('DP Cur', dpVal);
+    const spMax = ch.mpMax||0;
+    set('Sorce Max', spMax);    set('Sorce Cur', spMax);
+    set('Recovery Max', ch.level||1); set('Recovery Cur', ch.level||1);
+
+    // Spellcasting
+    if (ch.cls==='Magi')  set('spell att','Wits');
+    if (ch.cls==='Druid') set('spell att','Empathy');
+
+    // Talents on page 1 table
+    const allTalents = [ch.specialtyTalent||'', ...(ch.talents||[]).filter(t=>t)];
+    allTalents.slice(0,10).forEach((t,i) => {
+      set('MP Talent name '+(i+1), t);
+      // rank from talentRanks (index 0 is specialty, rest are talents)
+      const rank = i===0 ? (ch.specialtyRank||1) : (ch.talentRanks?.[i-1]||1);
+      set('MP Talent rank '+(i+1), String(rank));
+    });
+
+    // Notes
+    set('CHARACTER NOTES', ch.notes||'');
+
+    // Currency
+    set('Silver',  ch.currency?.silver||0);
+    set('Gold',    ch.currency?.gold||0);
+    set('Pluther', ch.currency?.pluther||0);
+
+    // Equipment
+    const ARMOR_NAMES_PDF = ['quilted vest','layered plate','light leather','reinforced tunic','brigandine'];
+    const gearVals = Object.values(ch.gearSelections||{}).filter(v=>v).length > 0
+      ? Object.values(ch.gearSelections||{}).filter(v=>v)
+      : (ch.equip||[]).filter(v=>v);
+    const armorItem = gearVals.find(v=>ARMOR_NAMES_PDF.some(a=>v.toLowerCase().includes(a)))||'';
+    const BELT_KWORDS = ['short sword','hand axe','hammer','long sword','battle axe','flintlock pistol','bullet pouch','limb wraps','bolt pouch','dagger','arcane wand','shortsword','pistol'];
+    const BACK_KWORDS = ['small shield','mace','light crossbow','crossbow','short bow','shortbow','arrow quiver','arcane staff','arcane instrument','longsword'];
+    const isKit = v => ['alchemy kit','engineer tool kit'].some(k=>v.toLowerCase().includes(k));
+    const slotOf = v => { const lv=v.toLowerCase(); if(BACK_KWORDS.some(k=>lv.includes(k))) return 'back'; if(BELT_KWORDS.some(k=>lv.includes(k))) return 'belt'; return 'belt'; };
+    const kitItem = gearVals.find(isKit)||'';
+    const gearItems = gearVals.filter(v=>!ARMOR_NAMES_PDF.some(a=>v.toLowerCase().includes(a))&&!isKit(v));
+    const expanded = [];
+    gearItems.forEach(v=>{ expanded.push(v); if(v.toLowerCase()==='shortbow and arrow quiver'){expanded[expanded.length-1]='Shortbow';expanded.push('Arrow Quiver');} });
+    const backSlots = expanded.filter(v=>slotOf(v)==='back').slice(0,2);
+    const beltSlots = expanded.filter(v=>slotOf(v)==='belt').slice(0,2);
+    set('Equipment 1', armorItem);
+    set('Equipment 2', backSlots[0]||'');
+    set('Equipment 3', backSlots[1]||'');
+    set('Equipment 4', beltSlots[0]||'');
+    set('Equipment 5', beltSlots[1]||'');
+    set('Equipment 6', kitItem);
+    setSmall('Back and kit features','Backpack',14);
+    setSmall('carry Cur','8',14);
+
+    // Page 2 — Lifepath
+    set('Upbringing', ch.lifepath?.upbringing||ch.lifepathCustom?.upbringing||'');
+    set('Culture', ch.lifepath?.culture||ch.lifepathCustom?.culture||'');
+    set('Personality', ch.lifepath?.personality||ch.lifepathCustom?.personality||'');
+    set('Value Most', ch.lifepath?.value||ch.lifepathCustom?.value||'');
+    set('What Upsets You', ch.lifepath?.upset||ch.lifepathCustom?.upset||'');
+    set('How you approach Decisions', ch.lifepath?.decisions||ch.lifepathCustom?.decisions||'');
+    set('How you view others', ch.lifepath?.viewOfOthers||ch.lifepathCustom?.viewOfOthers||'');
+    (ch.notable||[]).slice(0,10).forEach((n,i)=>set('Notable Char '+(i+1),n||''));
+
+    // Page 3 — Talents
+    setSmall('LINEAGE BENEFITS', ch.lineageBenefits||'', 11);
+    setSmall('SPECIALTY TALENT', ch.specialtyTalent||'', 11);
+    const talentFields=['TALENT','TALENT_2','TALENT_3','TALENT_4','TALENT_5','TALENT_6','TALENT_7','TALENT_8','TALENT_9'];
+    (ch.talents||[]).filter(t=>t).slice(0,9).forEach((t,i) => {
+      if (i===0 && TALENT_DATA[t]?.[0]) {
+        const rank1 = TALENT_DATA[t][0].replace(/<[^>]+>/g,'').replace(/&amp;/g,'&');
+        setSmall(talentFields[i], t+'\nRank 1: '+rank1, 9);
+      } else {
+        setSmall(talentFields[i], t, 11);
+      }
+    });
+    const allTalentsPage3 = [ch.specialtyTalent||'', ...(ch.talents||[]).filter(t=>t)];
+    allTalentsPage3.slice(0,10).forEach((t,i) => {
+      try { setSmall('MP Talent name '+(i+1), t, 11); } catch(e) {}
+      try { set('MP Talent rank '+(i+1), String(i===0?(ch.specialtyRank||1):(ch.talentRanks?.[i-1]||1))); } catch(e) {}
+    });
+
+    // Weapons
+    const seenWeapons = new Set();
+    const weapEntries = [];
+    gearVals.forEach(item => {
+      const wExact = WEAPON_DATA[item];
+      const wTitle = WEAPON_DATA[item.split(' ').map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' ')];
+      const wLowerKey = Object.keys(WEAPON_DATA).find(k=>k.toLowerCase()===item.toLowerCase());
+      const w = wExact||wTitle||(wLowerKey?WEAPON_DATA[wLowerKey]:null);
+      if (w) {
+        const nm = w.name||item;
+        if (seenWeapons.has(nm.toLowerCase())) return;
+        seenWeapons.add(nm.toLowerCase());
+        weapEntries.push({name:nm,range:w.range,mod:w.mod,damage:w.damage,pool:buildDicePoolForChar(w.attr,w.skill,w.mod,ch),features:w.features});
+      }
+    });
+    weapEntries.slice(0,5).forEach((w,i) => {
+      const n=i+1;
+      set('attack name '+n,w.name); set('attack range '+n,w.range);
+      set('attack mod '+n,w.mod);   set('attack damage '+n,w.damage);
+      set('attack pool '+n,w.pool); set('attack features '+n,w.features);
+    });
+
+    // Page 4 — Spells
+    const studyTalent = (ch.talents||[]).find(t=>t&&t.startsWith('Study of'));
+    if (studyTalent && STUDY_SPELLS[studyTalent]) {
+      const study = STUDY_SPELLS[studyTalent];
+      (study.rank0||[]).slice(0,7).forEach((sp,i) => {
+        const n=i+1;
+        set('r0sname'+n,winansi(sp.name)); set('r0sstudy'+n,winansi(sp.study));
+        set('r0srange'+n,winansi(sp.range)); set('r0sct'+n,winansi(sp.ct));
+        set('r0sshape'+n,winansi(sp.shape)); set('r0sduration'+n,winansi(sp.dur));
+        setSmall('rank0spower'+n, sp.pl==='-'?'':sp.pl, 9);
+        if(sp.focus) { try{form.getCheckBox('rk0f'+n).check();}catch(e){} }
+      });
+      (study.rank1||[]).slice(0,7).forEach((sp,i) => {
+        const n=i+1;
+        set('r1sname'+n,winansi(sp.name)); set('r1sstudy'+n,winansi(sp.study));
+        set('r1srange'+n,winansi(sp.range)); set('r1sct'+n,winansi(sp.ct));
+        set('r1sshape'+n,winansi(sp.shape)); set('r1sduration'+n,winansi(sp.dur));
+        setSmall('rank1spower'+n, sp.pl==='-'?'':sp.pl, 9);
+        if(sp.focus) { try{form.getCheckBox('rk1f'+n).check();}catch(e){} }
+      });
+    }
+
+    // Serialize
+    const filledBytes = await pdf.save();
+    const blob = new Blob([filledBytes],{type:'application/pdf'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = winansi(ch.name||'character')+'_level'+(ch.level||1)+'_sheet.pdf';
+    a.click();
+  } catch(err) {
+    alert('PDF generation failed: '+err.message+'\nMake sure Character_Sheet_Form_Fill.pdf is in the same folder.');
+  } finally {
+    btn.textContent = origText;
+    btn.disabled = false;
+  }
+}
+
+</script>
+</body>
+</html>
