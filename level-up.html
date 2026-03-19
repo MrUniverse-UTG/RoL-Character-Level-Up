@@ -878,15 +878,23 @@ async function exportPDF() {
         if (sp.focus) { try { form.getCheckBox('rk1f' + n).check(); } catch(e) {} }
       });
     }
-    setSmall('SPECIALTY TALENT',  ch.specialtyTalent||'', 11);
+    // Specialty talent: use stored text, or generate based on rank
+    const specRank = ch.specialtyRank || 1;
+    let specText = ch.specialtyTalent || '';
+    if (!specText && ch.specialty) {
+      specText = ch.specialty + ' Specialty Talent (Rank ' + specRank + ')';
+    }
+    setSmall('SPECIALTY TALENT', specText, 9);
     const talentFields = ['TALENT','TALENT_2','TALENT_3','TALENT_4','TALENT_5','TALENT_6','TALENT_7','TALENT_8','TALENT_9'];
     ch.talents.filter(t=>t).slice(0,9).forEach((t,i) => {
-      if (i === 0 && TALENT_DATA[t] && TALENT_DATA[t][0]) {
-        // First talent box: show name + Rank 1 description (strip HTML tags)
-        const rank1Text = TALENT_DATA[t][0].replace(/<[^>]+>/g, '').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&nbsp;/g,' ');
-        setSmall(talentFields[i], t + '\nRank 1: ' + rank1Text, 9);
+      const tRank = ch.talentRanks?.[i] || 1;
+      const tData = TALENT_DATA[t];
+      if (tData && tData[tRank-1]) {
+        const rankText = tData[tRank-1].replace(/<[^>]+>/g,'').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&nbsp;/g,' ');
+        const fontSize = i === 0 ? 6 : (rankText.length > 120 ? 7 : 9);
+        setSmall(talentFields[i], t + ' (Rank ' + tRank + ')\n' + rankText, fontSize);
       } else {
-        setSmall(talentFields[i], t, 11);
+        setSmall(talentFields[i], t + (tRank > 1 ? ' (Rank ' + tRank + ')' : ''), 11);
       }
     });
     // Also set small font on talent rank fields in the main table
@@ -1705,9 +1713,17 @@ function renderTalent() {
   const generalPool = GENERAL_TALENTS;
   const sel=session.talentGain;
 
-  const myHTML = myTalents.length ? myTalents.map(t => {
+  // Deduplicate myTalents by name (in case of data issues)
+  const seen = new Set();
+  const uniqueTalents = myTalents.filter(t => { if(seen.has(t.name)) return false; seen.add(t.name); return true; });
+
+  const myHTML = uniqueTalents.length ? uniqueTalents.map(t => {
     const atCap=t.rank>=cap;
-    const canRU=!atCap&&(martialPool.includes(t.name)||sorceryPool.includes(t.name)||generalPool.includes(t.name));
+    // Only allow rank-up if TALENT_DATA has a rank beyond current
+    const talentData = TALENT_DATA[t.name];
+    const hasMoreRanks = talentData && talentData.length > t.rank;
+    const inPool = martialPool.includes(t.name)||sorceryPool.includes(t.name)||generalPool.includes(t.name);
+    const canRU=!atCap && hasMoreRanks && inPool;
     const isSel=sel&&!sel.isNew&&sel.name===t.name;
     return `<div class="opt-chip ${isSel?'sel-green':''} ${!canRU&&!isSel?'dim':''}"
       onclick="${canRU||isSel?`selTalentRU('${t.name.replace(/'/g,"\\'")}')`:''}"
@@ -1729,7 +1745,7 @@ function renderTalent() {
   const descHTML = sel?.name ? (() => {
     const data=TALENT_DATA[sel.name];
     if (!data) return `<p style="color:var(--muted)">See Talents chapter.</p>`;
-    const myRank=myTalents.find(t=>t.name===sel.name)?.rank||0;
+    const myRank=(eff.talents||[]).map((t,i)=>t===sel.name?(eff.talentRanks?.[i]||1):0).find(r=>r>0)||0;
     const showR=myRank>0?myRank+1:1;
     return `<table class="rtable"><thead><tr><th>Rank</th><th>Description</th></tr></thead><tbody>
       ${data.map((row,i)=>`<tr class="${i+1===showR?'hl':''}"><td>R${i+1}${i+1===showR?' ★':''}</td><td>${row.replace(/<[^>]+>/g,'').replace(/&amp;/g,'&')}</td></tr>`).join('')}
@@ -2035,10 +2051,11 @@ async function exportPDF() {
         setSmall(talentFields[i], t, 11);
       }
     });
-    const allTalentsPage3 = [ch.specialtyTalent||'', ...(ch.talents||[]).filter(t=>t)];
-    allTalentsPage3.slice(0,10).forEach((t,i) => {
+    const allTalentsPage1 = [specText, ...(ch.talents||[]).filter(t=>t)];
+    allTalentsPage1.slice(0,10).forEach((t,i) => {
       try { setSmall('MP Talent name '+(i+1), t, 11); } catch(e) {}
-      try { set('MP Talent rank '+(i+1), String(i===0?(ch.specialtyRank||1):(ch.talentRanks?.[i-1]||1))); } catch(e) {}
+      const rank = i===0 ? specRank : (ch.talentRanks?.[i-1]||1);
+      try { set('MP Talent rank '+(i+1), String(rank)); } catch(e) {}
     });
 
     // Weapons
