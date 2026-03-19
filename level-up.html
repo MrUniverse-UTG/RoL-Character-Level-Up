@@ -999,31 +999,6 @@ function saveJSON() {
   }
 }
 
-function loadJSON(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    try {
-      const data = JSON.parse(e.target.result);
-      // Restore ch state
-      Object.keys(data.ch).forEach(k => { ch[k] = data.ch[k]; });
-      // Go to the saved step
-      const targetStep = data.currentStep || 1;
-      initAllSteps();
-      goToStep(targetStep);
-      // Show confirmation
-      const ind = document.getElementById('save-indicator');
-      if (ind && data.savedAt) {
-        ind.textContent = 'Loaded save from ' + data.savedAt;
-        ind.style.display = 'inline';
-      }
-    } catch(err) {
-      alert('Failed to load file: ' + err.message);
-    }
-  };
-  reader.readAsText(file);
-}
 
 function applyStartingGear() {
   if (!ch.specialty || !STARTING_GEAR[ch.specialty]) return;
@@ -1279,60 +1254,6 @@ function startOver() {
 
 // ═══════════════════════════════════════════════════════════════
 // INIT
-// ═══════════════════════════════════════════════════════════════
-function initAllSteps() {
-  // Safe init: only render steps that have been reached, or render defensively
-  renderArrayPicker();
-  if (ch.array !== null) {
-    const aa = document.getElementById('attr-assign');
-    if (aa) { aa.style.display = 'grid'; renderAttrAssign(); }
-  }
-  renderSkillList();
-  renderLineageGrid();
-  if (ch.lineage) {
-    const detail = document.getElementById('lineage-detail');
-    if (detail) { detail.style.display = 'block'; renderLineageDetail(); }
-  }
-  renderClassGrid();
-  if (ch.cls) renderClassSkillChoices();
-  renderSpecialtyGrid();
-  renderLifepath();
-  // Only render step 8 & 9 if their key containers exist
-  if (document.getElementById('talent-browser')) renderTalentStep();
-  if (document.getElementById('notable-slots'))  renderDetailsStep();
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  initAllSteps();
-  goToStep(1);
-
-  // Sync live fields on step changes
-  document.getElementById('btn-next').addEventListener('click', () => {
-    if (currentStep === 10) {
-      ch.name    = document.getElementById('char-name').value;
-      ch.level   = +document.getElementById('char-level').value||1;
-
-      ch.notes   = document.getElementById('char-notes').value;
-    }
-  });
-
-  // Re-render dependent steps when navigating back
-  document.querySelectorAll('.prog-step').forEach(el => {
-    el.addEventListener('click', () => {
-      const s = parseInt(el.dataset.step);
-      if (s < currentStep) {
-        if (s === 2) renderSkillList();
-        if (s === 3) renderLineageGrid();
-        if (s === 4) { renderClassGrid(); renderClassSkillChoices(); }
-        if (s === 5) renderSpecialtyGrid();
-        if (s === 6) renderLifepath();
-        if (s === 8) renderTalentStep();
-        if (s === 9) renderDetailsStep();
-      }
-    });
-  });
-});
-
 const WEAPON_DATA = {
   'Short Sword':      {range:'5 ft.', mod:'+1', damage:'6 Slash',  attr:'STR_AGI_HIGH', skill:'Brawl', features:'Balanced'},
   'Shortsword':       {range:'5 ft.', mod:'+1', damage:'6 Slash',  attr:'STR_AGI_HIGH', skill:'Brawl', features:'Balanced'},
@@ -1835,9 +1756,12 @@ function renderSummaryStep() {
       <button class="btn btn-save" onclick="saveJSON()">💾 Save JSON</button>
       <button class="btn btn-export" onclick="exportPDF()">⬇ Export PDF Sheet</button>
     </div>
+    ${session.targetLevel < 20 ? `<button class="btn" onclick="levelUpAgain()"
+      style="background:var(--safe);color:#fff;padding:11px 22px;font-size:.95rem;font-weight:700;margin-top:12px;display:block;width:100%;border-radius:7px;border:none;cursor:pointer">
+      ⬆ Level Up Again → Level ${session.targetLevel + 1}
+    </button>` : '<div class="good-box" style="margin-top:12px">🏆 Level 20 reached — maximum level!</div>'}
     <p style="font-size:.78rem;color:var(--muted);margin-top:10px">
-      The JSON file can be loaded here again to level up further.
-      The PDF is the complete character sheet at Level ${lvl}.
+      Save JSON to keep a backup. The PDF is the complete sheet at Level ${lvl}.
     </p>
   </div>`;
 }
@@ -2028,6 +1952,53 @@ function levelUpAgain() {
   const data={...baseChar, ch:updCh, levelHistory:[...(baseChar.levelHistory||[]),buildHistoryEntry()], savedAt:new Date().toLocaleString()};
   try { localStorage.setItem('rol_character', JSON.stringify(data)); } catch(e) {}
   location.reload();
+}
+
+// ── LocalStorage auto-detection on page load ────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  try {
+    const saved = localStorage.getItem('rol_character');
+    if (saved) {
+      const data = JSON.parse(saved);
+      const ch = data.ch || data;
+      if (ch && ch.cls) {
+        const lvl = ch.level || 1;
+        const panel = document.getElementById('ls-panel');
+        const nameEl = document.getElementById('ls-char-name');
+        if (panel) panel.style.display = 'block';
+        if (nameEl) {
+          nameEl.textContent = (ch.name||'Unnamed Hero') + ' — Level ' + lvl + ' ' + (ch.cls||'') + ' ' + (ch.specialty||'');
+          if (lvl >= 20) {
+            nameEl.textContent += ' (Level 20 — max level reached)';
+            const btn = panel.querySelector('.btn-primary');
+            if (btn) btn.disabled = true;
+          }
+        }
+      }
+    }
+  } catch(e) {}
+});
+
+function loadFromLocalStorage() {
+  try {
+    const saved = localStorage.getItem('rol_character');
+    if (!saved) return;
+    const data = JSON.parse(saved);
+    const ch = data.ch || data;
+    if (!ch || !ch.cls) throw new Error('Invalid character data.');
+    if ((ch.level||1) >= 20) { alert('This character is already at maximum level (20).'); return; }
+    baseChar = data;
+    initEffective();
+    initSession();
+    buildSteps();
+    document.getElementById('load-panel').style.display = 'none';
+    document.getElementById('wizard').style.display = 'block';
+    renderBanner();
+    renderProgress();
+    renderStep();
+  } catch(err) {
+    alert('Error loading character: ' + err.message);
+  }
 }
 
 </script>
