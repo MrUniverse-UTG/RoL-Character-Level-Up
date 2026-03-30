@@ -4,62 +4,118 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Realms of Legacy — Character Tools</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;0,700;1,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{
-  --accent:#4a3f8f;--accent-lt:#ede9fb;--accent-dk:#2e2660;
-  --gold:#b8860b;--safe:#16a34a;--muted:#6b7280;--rule:#e5e0d8;--ink:#1a1614;--bg:#f4f1ec;
-  --r:12px;--font-ui:"Segoe UI",Arial,sans-serif;
+:root {
+  --void:#04060f; --deep:#080d1c; --mid:#0d1630; --surface:#111b3a;
+  --border:rgba(100,160,255,0.15); --border-gold:rgba(201,168,76,0.25);
+  --cyan:#4fc3f7; --cyan-glow:rgba(79,195,247,0.3);
+  --gold:#c9a84c; --gold-pale:#e8d5a3; --gold-glow:rgba(201,168,76,0.3);
+  --text:#c8d8f0; --text-dim:#7a90b8;
+  --safe:#4ade80;
+  --card-bg:rgba(17,27,58,0.8); --card-border:rgba(100,160,255,0.15);
+  --r:8px;
+  --font-display:'Cinzel Decorative',serif;
+  --font-heading:'Cinzel',serif;
+  --font-body:'Crimson Pro',Georgia,serif;
+  --font-ui:'DM Sans',system-ui,sans-serif;
 }
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);font-family:var(--font-ui);color:var(--ink);min-height:100vh;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}
-.hero{text-align:center;max-width:700px;width:100%}
-.hero h1{font-size:2.3rem;color:var(--accent-dk);letter-spacing:.02em;margin-bottom:8px}
-.hero p{color:var(--muted);font-size:1rem;margin-bottom:40px;line-height:1.6;max-width:520px;margin-left:auto;margin-right:auto}
-.cards{display:grid;grid-template-columns:1fr 1fr;gap:20px;width:100%}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px}
+body{
+  background:var(--void);font-family:var(--font-body);color:var(--text);
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:40px 20px;overflow-x:hidden;
+  font-variant-ligatures:no-common-ligatures;
+}
+#starfield{position:fixed;inset:0;z-index:0;pointer-events:none}
+.wrap{position:relative;z-index:1;text-align:center;max-width:720px;width:100%}
+.hero-eyebrow{
+  font-family:var(--font-heading);font-size:.72rem;letter-spacing:.35em;
+  text-transform:uppercase;color:var(--cyan);opacity:.8;margin-bottom:1.2rem;
+}
+.hero-title{
+  font-family:var(--font-display);font-size:clamp(2rem,6vw,3.4rem);
+  font-weight:700;line-height:1.1;
+  background:linear-gradient(135deg,#f0d080 0%,#c9a84c 40%,#e8c96a 70%,#a07830 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 0 30px rgba(201,168,76,0.35));margin-bottom:.5rem;
+}
+.hero-divider{
+  display:flex;align-items:center;gap:1rem;max-width:400px;margin:1.2rem auto;
+}
+.hero-divider::before,.hero-divider::after{
+  content:'';flex:1;height:1px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.4;
+}
+.hero-divider span{color:var(--gold);font-size:1rem;opacity:.5}
+.hero-desc{
+  font-family:var(--font-ui);font-size:.92rem;color:var(--text-dim);
+  max-width:500px;margin:0 auto 2.5rem;line-height:1.65;
+}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:20px;width:100%;margin-bottom:24px}
 @media(max-width:540px){.cards{grid-template-columns:1fr}}
-.ocard{background:#fff;border:2px solid var(--rule);border-radius:var(--r);padding:28px 24px;
-  text-decoration:none;color:var(--ink);transition:all .15s;display:block}
-.ocard:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(74,63,143,.12)}
-.ocard.create{border-color:var(--accent)}
-.ocard.create:hover{border-color:var(--accent-dk)}
-.ocard.levelup:hover{border-color:var(--safe)}
-.ocard .icon{font-size:2.8rem;margin-bottom:14px}
-.ocard h2{font-size:1.2rem;font-weight:700;color:var(--accent-dk);margin-bottom:8px}
-.ocard.levelup h2{color:var(--safe)}
-.ocard p{font-size:.88rem;color:var(--muted);line-height:1.6}
-.ocard .badge{display:inline-block;margin-top:16px;padding:7px 16px;
-  border-radius:20px;font-weight:700;font-size:.82rem;background:var(--accent);color:#fff}
-.ocard.levelup .badge{background:var(--safe)}
-.ls-notice{margin-top:18px;padding:12px 18px;background:#f0fdf4;
-  border:1px solid var(--safe);border-radius:var(--r);font-size:.87rem;color:var(--safe);font-weight:600}
-.footer{margin-top:32px;color:var(--muted);font-size:.8rem}
+.ocard{
+  background:var(--card-bg);border:1px solid var(--card-border);
+  border-radius:var(--r);padding:28px 24px;text-decoration:none;color:var(--text);
+  transition:all .2s;display:block;backdrop-filter:blur(4px);text-align:left;
+}
+.ocard:hover{transform:translateY(-2px)}
+.ocard.create{border-color:var(--border-gold)}
+.ocard.create:hover{border-color:var(--gold);box-shadow:0 8px 30px rgba(201,168,76,0.12)}
+.ocard.levelup:hover{border-color:rgba(79,195,247,0.4);box-shadow:0 8px 30px rgba(79,195,247,0.08)}
+.ocard .icon{font-size:2rem;margin-bottom:14px}
+.ocard h2{
+  font-family:var(--font-heading);font-size:1rem;font-weight:700;
+  letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;
+}
+.ocard.create h2{color:var(--gold-pale)}
+.ocard.levelup h2{color:var(--cyan)}
+.ocard p{font-family:var(--font-ui);font-size:.86rem;color:var(--text-dim);line-height:1.6}
+.badge{
+  display:inline-block;margin-top:18px;padding:7px 18px;border-radius:3px;
+  font-family:var(--font-heading);font-weight:600;font-size:.72rem;
+  letter-spacing:.1em;text-transform:uppercase;transition:all .2s;
+}
+.ocard.create .badge{background:var(--gold);color:var(--void);border:1px solid var(--gold)}
+.ocard.create:hover .badge{background:var(--gold-pale)}
+.ocard.levelup .badge{background:transparent;color:var(--cyan);border:1px solid rgba(79,195,247,0.4)}
+.ocard.levelup:hover .badge{background:rgba(79,195,247,0.08)}
+.ls-notice{
+  padding:12px 18px;background:rgba(74,222,128,0.06);
+  border:1px solid rgba(74,222,128,0.3);border-radius:var(--r);
+  font-family:var(--font-ui);font-size:.85rem;color:var(--safe);
+}
+.footer{margin-top:32px;font-family:var(--font-heading);color:var(--text-dim);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;opacity:.5}
 </style>
 </head>
 <body>
-<div class="hero">
-  <div style="font-size:3.2rem;margin-bottom:10px">⚔️</div>
-  <h1>Realms of Legacy</h1>
-  <p>Create a Level 1 character or level up an existing one. Each tool guides you step by step and exports a filled PDF character sheet.</p>
+<canvas id="starfield"></canvas>
+<div class="wrap">
+  <div class="hero-eyebrow">Tabletop Roleplaying Game</div>
+  <h1 class="hero-title">Realms of Legacy</h1>
+  <div class="hero-divider"><span>&#9876;</span></div>
+  <p class="hero-desc">Create a Level 1 character or level up an existing one. Each tool guides you step by step and exports a filled PDF character sheet.</p>
 
   <div class="cards">
     <a href="create.html" class="ocard create">
-      <div class="icon">📜</div>
+      <div class="icon">&#128220;</div>
       <h2>Create a Character</h2>
       <p>Build a brand-new Level 1 character from scratch — attributes, lineage, class, specialty, gear, lifepath, and talents.</p>
-      <div class="badge">Start Creating →</div>
+      <div class="badge">Start Creating &rarr;</div>
     </a>
     <a href="level-up.html" class="ocard levelup">
-      <div class="icon">⬆</div>
+      <div class="icon">&#11014;</div>
       <h2>Level Up</h2>
       <p>Advance an existing character to the next level. Load your saved JSON to spend Status Points, Skill Points, and your Talent Point.</p>
-      <div class="badge" id="lu-badge">Level Up →</div>
+      <div class="badge" id="lu-badge">Level Up &rarr;</div>
     </a>
   </div>
 
   <div class="ls-notice" id="ls-notice" style="display:none"></div>
-
-  
+  <div class="footer">Realms of Legacy Character Tools</div>
 </div>
 
 <script>
@@ -74,7 +130,7 @@ try {
       const badge  = document.getElementById('lu-badge');
       if (notice) {
         notice.style.display = 'block';
-        notice.textContent = '\u2713 ' + (ch.name||'Unnamed Hero') + ' (Level ' + lvl + ' ' + (ch.cls||'') + ') is saved — click Level Up to continue.';
+        notice.textContent = '\u2713 ' + (ch.name||'Unnamed Hero') + ' (Level ' + lvl + ' ' + (ch.cls||'') + ') is saved \u2014 click Level Up to continue.';
       }
       if (badge && lvl < 20) {
         badge.textContent = (ch.name||'Character') + ' \u2192 Level ' + (lvl+1);
@@ -84,6 +140,38 @@ try {
     }
   }
 } catch(e) {}
+</script>
+
+<script>
+(function(){
+  const canvas = document.getElementById('starfield');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let stars = [];
+  const COUNT = 220;
+  function resize(){ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+  function init(){
+    stars = [];
+    for (let i = 0; i < COUNT; i++) {
+      stars.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height,
+        r:Math.random()*1.4+0.2, alpha:Math.random()*0.6+0.2,
+        speed:Math.random()*0.015+0.003, phase:Math.random()*Math.PI*2});
+    }
+  }
+  function draw(t){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    for (const s of stars){
+      const a = s.alpha * (0.6 + 0.4 * Math.sin(t * s.speed + s.phase));
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(200,220,255,' + a + ')';
+      ctx.fill();
+    }
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener('resize', ()=>{ resize(); init(); });
+  resize(); init(); requestAnimationFrame(draw);
+})();
 </script>
 </body>
 </html>
