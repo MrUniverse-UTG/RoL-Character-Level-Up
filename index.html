@@ -112,7 +112,9 @@ body{
       <p>Advance an existing character to the next level. Spend Status Points, Skill Points, and your Talent Point.</p>
       <div id="lu-options" style="margin-top:16px;display:flex;flex-direction:column;gap:8px">
         <a href="level-up.html" class="badge" id="lu-badge" style="display:block;text-align:center;text-decoration:none">Level Up &rarr;</a>
-        <a href="level-up.html" id="lu-fresh-btn" class="badge" style="display:none;text-align:center;text-decoration:none;background:transparent;color:var(--safe);border-color:rgba(74,222,128,0.4)" onclick="passCharToLevelUp(event)">&#11014; Level Up New Character</a>
+        <a href="level-up.html" id="lu-fresh-btn" class="badge" style="display:none;text-align:center;text-decoration:none;background:transparent;color:var(--safe);border-color:rgba(74,222,128,0.4)">&#11014; Level Up New Character</a>
+        <button onclick="document.getElementById('lu-json-input').click()" class="badge" style="display:block;width:100%;text-align:center;background:transparent;color:var(--text-dim);border-color:var(--border);cursor:pointer">&#128193; Load a Different Character</button>
+        <input type="file" id="lu-json-input" accept=".json" style="display:none" onchange="loadAndRedirect(event)">
       </div>
     </div>
   </div>
@@ -149,6 +151,24 @@ try {
     }
   }
 } catch(e) {}
+
+function loadAndRedirect(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      const ch = data.ch || data;
+      if (!ch || !ch.cls) { alert('Not a valid Realms of Legacy character file.'); return; }
+      localStorage.setItem('rol_character', JSON.stringify(data));
+      window.location.href = 'level-up.html';
+    } catch(err) {
+      alert('Could not read file: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+}
 </script>
 
 <script>
