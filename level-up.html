@@ -1588,9 +1588,11 @@ function loadChar(event) {
 }
 
 function initEffective() {
+  // baseChar.ch is always the fully-accumulated current character state.
+  // levelHistory is stored separately for record-keeping but must NOT be
+  // re-applied here — doing so would double-count every previous level-up gain.
   const ch = baseChar.ch || baseChar;
   eff = JSON.parse(JSON.stringify(ch));
-  (baseChar.levelHistory||[]).forEach(entry => applyEntry(eff, entry));
   if (!eff.talents) eff.talents = Array(9).fill('');
   if (!eff.talentRanks) eff.talentRanks = Array(9).fill(1);
   if (!eff.skills) eff.skills = {};
