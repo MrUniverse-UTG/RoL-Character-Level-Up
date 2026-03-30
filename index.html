@@ -106,12 +106,15 @@ body{
       <p>Build a brand-new Level 1 character from scratch — attributes, lineage, class, specialty, gear, lifepath, and talents.</p>
       <div class="badge">Start Creating &rarr;</div>
     </a>
-    <a href="level-up.html" class="ocard levelup">
+    <div class="ocard levelup" style="cursor:default">
       <div class="icon">&#11014;</div>
       <h2>Level Up</h2>
-      <p>Advance an existing character to the next level. Load your saved JSON to spend Status Points, Skill Points, and your Talent Point.</p>
-      <div class="badge" id="lu-badge">Level Up &rarr;</div>
-    </a>
+      <p>Advance an existing character to the next level. Spend Status Points, Skill Points, and your Talent Point.</p>
+      <div id="lu-options" style="margin-top:16px;display:flex;flex-direction:column;gap:8px">
+        <a href="level-up.html" class="badge" id="lu-badge" style="display:block;text-align:center;text-decoration:none">Level Up &rarr;</a>
+        <a href="level-up.html" id="lu-fresh-btn" class="badge" style="display:none;text-align:center;text-decoration:none;background:transparent;color:var(--safe);border-color:rgba(74,222,128,0.4)" onclick="passCharToLevelUp(event)">&#11014; Level Up New Character</a>
+      </div>
+    </div>
   </div>
 
   <div class="ls-notice" id="ls-notice" style="display:none"></div>
@@ -128,6 +131,7 @@ try {
       const lvl = ch.level || 1;
       const notice = document.getElementById('ls-notice');
       const badge  = document.getElementById('lu-badge');
+      const freshBtn = document.getElementById('lu-fresh-btn');
       if (notice) {
         notice.style.display = 'block';
         notice.textContent = '\u2713 ' + (ch.name||'Unnamed Hero') + ' (Level ' + lvl + ' ' + (ch.cls||'') + ') is saved \u2014 click Level Up to continue.';
@@ -136,6 +140,11 @@ try {
         badge.textContent = (ch.name||'Character') + ' \u2192 Level ' + (lvl+1);
       } else if (badge && lvl >= 20) {
         badge.textContent = 'Max Level Reached';
+      }
+      // Show skip-JSON button only when saved char is Level 1 (freshly created)
+      if (freshBtn && lvl === 1) {
+        freshBtn.style.display = 'block';
+        freshBtn.textContent = '\u2B06 Level Up ' + (ch.name||'New Character') + ' directly';
       }
     }
   }
